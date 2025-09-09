@@ -157,6 +157,14 @@ select:focus {
     0 0 0 1px rgba(6, 182, 212, 0.3);
 }
 
+/* Line clamp utility */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Text gradient animations */
 .text-gradient {
   background: linear-gradient(45deg, #06b6d4, #8b5cf6, #ec4899);
