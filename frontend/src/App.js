@@ -53,6 +53,7 @@ function App() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [blogPosts, setBlogPosts] = useState([]);
+  const [socialPosts, setSocialPosts] = useState([]);
   const [socialPlatforms, setSocialPlatforms] = useState([]);
   const [contactForm, setContactForm] = useState({
     name: "",
