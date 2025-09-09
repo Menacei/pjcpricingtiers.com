@@ -541,7 +541,7 @@ function App() {
   // SEO: Add structured data and page tracking
   useEffect(() => {
     // Update page title dynamically
-    document.title = "PJC Web Designs - Affordable Website Design for Startups | Starting at $199";
+    document.title = "PJC Web Designs - Affordable Website Design for Startups | Starting at $259";
     
     // Add structured data for SEO
     const script = document.createElement('script');
