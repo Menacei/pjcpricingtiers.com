@@ -731,8 +731,9 @@ function App() {
                     <div className="relative overflow-hidden">
                       <img 
                         src={post.media_url} 
-                        alt="Social media post"
+                        alt={`PJC Web Designs ${post.platform} post: ${post.content.substring(0, 80)}...`}
                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
                       />
                     </div>
                   )}
