@@ -95,6 +95,7 @@ class PayPalOrderRequest(BaseModel):
     package_id: str
     origin_url: str
     customer_email: Optional[str] = None
+    total_pages: int = 0  # Total pages needed for pricing calculation
 
 class BlogPost(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
