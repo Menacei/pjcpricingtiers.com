@@ -650,7 +650,10 @@ function App() {
                   {service.icon}
                 </div>
                 <CardTitle className="text-2xl text-white mb-2">{service.name}</CardTitle>
-                <CardDescription className="text-3xl font-bold text-cyan-400">{service.price}</CardDescription>
+                <CardDescription className="text-3xl font-bold text-cyan-400 mb-2">{service.price}</CardDescription>
+                <div className="text-sm text-gray-400 italic">
+                  {service.priceNote}
+                </div>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3 mb-6">
