@@ -587,8 +587,8 @@ function App() {
               PJC Web Designs
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Affordable, professional websites for startups and growing businesses. 
-              Starting at just $259 – final price determined by your page count and specific needs.
+              Professional websites for startups and growing businesses. 
+              Starting at just $324.99 – final price determined by your page count and specific needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-4 text-lg">
