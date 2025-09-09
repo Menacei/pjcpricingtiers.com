@@ -86,6 +86,7 @@ class CheckoutRequest(BaseModel):
     origin_url: str
     customer_email: Optional[str] = None
     payment_method: str = "stripe"  # "stripe" or "paypal"
+    total_pages: int = 0  # Total pages needed for pricing calculation
 
 class PaymentStatusRequest(BaseModel):
     session_id: str
