@@ -196,6 +196,7 @@ function App() {
 
   const services = [
     {
+      id: "essential",
       name: "Essential Web Presence",
       price: "$599.99",
       features: [
@@ -210,6 +211,7 @@ function App() {
       color: "from-cyan-400 to-blue-500"
     },
     {
+      id: "professional",
       name: "Professional Business Suite",
       price: "$2,999.99",
       features: [
@@ -227,6 +229,7 @@ function App() {
       popular: true
     },
     {
+      id: "enterprise",
       name: "Enterprise Digital Ecosystem",
       price: "$10,000",
       features: [
