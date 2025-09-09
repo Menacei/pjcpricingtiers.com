@@ -49,6 +49,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState("");
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [socialPlatforms, setSocialPlatforms] = useState([]);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
@@ -57,6 +59,30 @@ function App() {
     message: ""
   });
   const chatEndRef = useRef(null);
+
+  // Fetch blog posts
+  useEffect(() => {
+    const fetchBlogPosts = async () => {
+      try {
+        const response = await axios.get(`${API}/blog?limit=3`);
+        setBlogPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching blog posts:", error);
+      }
+    };
+
+    const fetchSocialPlatforms = async () => {
+      try {
+        const response = await axios.get(`${API}/social/platforms`);
+        setSocialPlatforms(response.data.platforms);
+      } catch (error) {
+        console.error("Error fetching social platforms:", error);
+      }
+    };
+
+    fetchBlogPosts();
+    fetchSocialPlatforms();
+  }, []);
 
   // Check for payment return from Stripe
   useEffect(() => {
