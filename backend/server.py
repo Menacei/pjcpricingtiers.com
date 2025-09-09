@@ -163,21 +163,21 @@ class SocialMediaPostCreate(BaseModel):
 # Fixed pricing packages (SECURITY: Never allow frontend to set prices)
 PACKAGES = {
     "starter": {
-        "base_price": 259.99,
+        "base_price": 324.99,
         "included_pages": 3,
-        "additional_page_price": 85.00,
+        "additional_page_price": 106.25,
         "max_pages": 10
     },
     "growth": {
-        "base_price": 649.99,
+        "base_price": 812.49,
         "included_pages": 8,
-        "additional_page_price": 80.00,
+        "additional_page_price": 100.00,
         "max_pages": 20
     },
     "scale": {
-        "base_price": 1299.99,
+        "base_price": 1624.99,
         "included_pages": 15,
-        "additional_page_price": 75.00,
+        "additional_page_price": 93.75,
         "max_pages": 50
     }
 }
