@@ -845,8 +845,9 @@ function App() {
                 <div className="relative overflow-hidden">
                   <img 
                     src={item.image} 
-                    alt={item.title}
+                    alt={`${item.title} - Professional web design project showcasing ${item.tech.join(', ')} technologies`}
                     className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
