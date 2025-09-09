@@ -1156,8 +1156,9 @@ function App() {
               <Card key={platform.id} className="bg-slate-700/50 border-slate-600 hover:border-cyan-400 transition-all duration-300 group">
                 <CardContent className="p-4 text-center">
                   <div 
-                    className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300"
+                    className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 cursor-pointer"
                     style={{ backgroundColor: `${platform.color}20`, border: `2px solid ${platform.color}` }}
+                    onClick={() => openSocialPlatform(platform.id)}
                   >
                     <div style={{ color: platform.color }}>
                       {getSocialIcon(platform.id)}
@@ -1170,13 +1171,14 @@ function App() {
                     variant="ghost"
                     size="sm"
                     className="mt-2 text-gray-400 hover:text-cyan-400"
-                    onClick={() => handleSocialShare(platform.id, 'pjc-web-designs')}
+                    onClick={() => openSocialPlatform(platform.id)}
                   >
                     Follow
                   </Button>
                 </CardContent>
               </Card>
             ))}
+          </div>
           </div>
         </div>
       </section>
