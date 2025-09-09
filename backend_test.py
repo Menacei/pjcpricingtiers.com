@@ -382,7 +382,7 @@ class PJCBackendTester:
             return False
             
         packages = response['packages']
-        expected_packages = ['essential', 'professional', 'enterprise']
+        expected_packages = ['starter', 'growth', 'scale']
         
         for expected_package in expected_packages:
             package_found = any(p['id'] == expected_package for p in packages)
@@ -391,6 +391,145 @@ class PJCBackendTester:
                 return False
                 
         print(f"✅ Found all {len(packages)} expected packages")
+        return True
+
+    def test_seo_endpoints(self):
+        """Test SEO-related endpoints"""
+        print("\n🔍 Testing SEO Endpoints...")
+        
+        # Test XML Sitemap
+        success, response = self.run_test("XML Sitemap", "GET", "sitemap.xml", 200, headers={'Accept': 'application/xml'})
+        if not success:
+            return False
+            
+        # For XML response, we need to check the text content
+        try:
+            url = f"{self.api_url}/sitemap.xml"
+            response = requests.get(url, timeout=30)
+            if response.status_code == 200:
+                sitemap_content = response.text
+                
+                # Check for required XML sitemap elements
+                required_elements = [
+                    '<?xml version="1.0" encoding="UTF-8"?>',
+                    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+                    '<url>',
+                    '<loc>',
+                    '<lastmod>',
+                    '<changefreq>',
+                    '<priority>'
+                ]
+                
+                for element in required_elements:
+                    if element not in sitemap_content:
+                        print(f"❌ Sitemap missing required element: {element}")
+                        return False
+                
+                # Check for main pages in sitemap
+                expected_pages = [
+                    'https://pjcwebdesigns.solutions',
+                    'https://pjcwebdesigns.solutions/#pricing',
+                    'https://pjcwebdesigns.solutions/#portfolio',
+                    'https://pjcwebdesigns.solutions/#blog',
+                    'https://pjcwebdesigns.solutions/#contact'
+                ]
+                
+                for page in expected_pages:
+                    if page not in sitemap_content:
+                        print(f"❌ Sitemap missing expected page: {page}")
+                        return False
+                
+                print("✅ XML Sitemap contains all required elements and pages")
+            else:
+                print(f"❌ Sitemap request failed with status: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error testing sitemap: {str(e)}")
+            return False
+        
+        # Test Robots.txt
+        try:
+            url = f"{self.api_url}/robots.txt"
+            response = requests.get(url, timeout=30)
+            if response.status_code == 200:
+                robots_content = response.text
+                
+                # Check for required robots.txt elements
+                required_elements = [
+                    'User-agent: *',
+                    'Allow: /',
+                    'Sitemap: https://pjcwebdesigns.solutions/api/sitemap.xml',
+                    'Crawl-delay: 1',
+                    'Disallow: /api/',
+                    'Disallow: /admin/'
+                ]
+                
+                for element in required_elements:
+                    if element not in robots_content:
+                        print(f"❌ Robots.txt missing required element: {element}")
+                        return False
+                
+                print("✅ Robots.txt contains all required directives")
+            else:
+                print(f"❌ Robots.txt request failed with status: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error testing robots.txt: {str(e)}")
+            return False
+        
+        # Test SEO Meta endpoint
+        success, response = self.run_test("SEO Meta Data", "GET", "seo/meta", 200)
+        if not success:
+            return False
+            
+        required_meta_fields = ['title', 'description', 'keywords', 'canonical', 'og_image', 'structured_data']
+        for field in required_meta_fields:
+            if field not in response:
+                print(f"❌ SEO meta missing required field: {field}")
+                return False
+        
+        # Verify structured data format
+        structured_data = response['structured_data']
+        if '@context' not in structured_data or '@type' not in structured_data:
+            print("❌ Structured data missing required JSON-LD fields")
+            return False
+            
+        if structured_data['@type'] != 'WebDesignCompany':
+            print(f"❌ Expected structured data type 'WebDesignCompany', got '{structured_data['@type']}'")
+            return False
+            
+        print("✅ SEO meta data endpoint working with correct structure")
+        
+        # Test Analytics Page View Tracking
+        page_view_data = {
+            "page": "/",
+            "referrer": "https://google.com"
+        }
+        success, response = self.run_test("Track Page View", "POST", "analytics/page-view", 200, page_view_data)
+        if not success:
+            return False
+            
+        if response.get('status') != 'tracked':
+            print(f"❌ Expected page view status 'tracked', got '{response.get('status')}'")
+            return False
+            
+        print("✅ Page view tracking working")
+        
+        # Test Performance Analytics
+        success, response = self.run_test("Get Performance Analytics", "GET", "analytics/performance", 200)
+        if not success:
+            return False
+            
+        required_analytics_fields = ['page_views', 'contact_submissions', 'social_engagement', 'last_updated']
+        for field in required_analytics_fields:
+            if field not in response:
+                print(f"❌ Performance analytics missing required field: {field}")
+                return False
+        
+        print("✅ Performance analytics endpoint working")
+        
         return True
 
 def main():
