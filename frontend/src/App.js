@@ -895,10 +895,10 @@ function App() {
             ))}
           </div>
         </div>
-      </div>
+        </section>
 
-      {/* Affiliate Partners Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        {/* Affiliate Partners Section */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" id="partners">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-white mb-6">
             Partner Network
