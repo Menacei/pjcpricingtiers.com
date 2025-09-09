@@ -538,6 +538,33 @@ function App() {
     );
   };
 
+  // SEO: Add structured data and page tracking
+  useEffect(() => {
+    // Update page title dynamically
+    document.title = "PJC Web Designs - Affordable Website Design for Startups | Starting at $199";
+    
+    // Add structured data for SEO
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "PJC Web Designs - Affordable Website Design for Startups",
+      "description": "Professional website design for startups and growing businesses starting at $199",
+      "url": window.location.href,
+      "mainEntity": {
+        "@type": "WebDesignCompany",
+        "name": "PJC Web Designs",
+        "priceRange": "$199-$999"
+      }
+    });
+    document.head.appendChild(script);
+    
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <PaymentStatusDisplay />
