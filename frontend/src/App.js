@@ -38,6 +38,8 @@ function App() {
   const [chatInput, setChatInput] = useState("");
   const [sessionId, setSessionId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState(null);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
@@ -46,6 +48,105 @@ function App() {
     message: ""
   });
   const chatEndRef = useRef(null);
+
+  // Check for payment return from Stripe
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    
+    if (sessionId) {
+      checkPaymentStatus(sessionId);
+    }
+  }, []);
+
+  // Function to get URL parameter
+  const getUrlParameter = (name) => {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    const results = regex.exec(window.location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  };
+
+  // Function to poll payment status
+  const pollPaymentStatus = async (sessionId, attempts = 0) => {
+    const maxAttempts = 5;
+    const pollInterval = 2000;
+
+    if (attempts >= maxAttempts) {
+      setPaymentStatus({
+        type: 'error',
+        message: 'Payment status check timed out. Please check your email for confirmation.'
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${API}/checkout/status/${sessionId}`);
+      
+      if (response.data.payment_status === 'paid') {
+        setPaymentStatus({
+          type: 'success',
+          message: 'Payment successful! Thank you for your purchase. We will contact you soon to start your project.'
+        });
+        return;
+      } else if (response.data.status === 'expired') {
+        setPaymentStatus({
+          type: 'error',
+          message: 'Payment session expired. Please try again.'
+        });
+        return;
+      }
+
+      // If payment is still pending, continue polling
+      setPaymentStatus({
+        type: 'pending',
+        message: 'Payment is being processed...'
+      });
+      setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+      setPaymentStatus({
+        type: 'error',
+        message: 'Error checking payment status. Please try again.'
+      });
+    }
+  };
+
+  // Function to check payment status when returning from Stripe
+  const checkPaymentStatus = (sessionId) => {
+    setPaymentStatus({
+      type: 'pending',
+      message: 'Checking payment status...'
+    });
+    pollPaymentStatus(sessionId);
+  };
+
+  // Function to initiate payment
+  const initiatePayment = async (packageId) => {
+    setPaymentLoading(packageId);
+    
+    try {
+      const originUrl = window.location.origin;
+      
+      const requestBody = {
+        package_id: packageId,
+        origin_url: originUrl,
+        customer_email: contactForm.email || null
+      };
+
+      const response = await axios.post(`${API}/checkout/session`, requestBody);
+      
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Failed to initiate payment. Please try again.');
+      setPaymentLoading("");
+    }
+  };
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
