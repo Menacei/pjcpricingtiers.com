@@ -1200,8 +1200,8 @@ function App() {
                     variant="ghost"
                     size="sm"
                     className="h-10 w-10 p-0 rounded-full border border-slate-700 hover:border-cyan-400 text-gray-400 hover:text-cyan-400"
-                    onClick={() => handleSocialShare(platform.id, 'pjc-web-designs')}
-                    title={`Follow us on ${platform.name}`}
+                    onClick={() => openSocialPlatform(platform.id)}
+                    title={`Follow PJC Web Designs on ${platform.name}`}
                   >
                     {getSocialIcon(platform.id)}
                   </Button>
