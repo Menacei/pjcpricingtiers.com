@@ -1195,6 +1195,51 @@ async def get_seo_meta():
         }
     }
 
+@api_router.post("/analytics/page-view")
+async def track_page_view(page: str, referrer: Optional[str] = None):
+    """Track page views for SEO analytics"""
+    try:
+        view_data = {
+            "id": str(uuid.uuid4()),
+            "page": page,
+            "referrer": referrer,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "user_agent": "",  # Could be added from request headers
+        }
+        await db.page_views.insert_one(view_data)
+        return {"status": "tracked"}
+    except Exception as e:
+        logging.error(f"Analytics tracking error: {str(e)}")
+        return {"status": "error"}
+
+@api_router.get("/analytics/performance")
+async def get_performance_data():
+    """Get basic performance analytics for SEO"""
+    try:
+        # Get page view counts
+        views = await db.page_views.aggregate([
+            {"$group": {"_id": "$page", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]).to_list(10)
+        
+        # Get contact form submissions count
+        contacts = await db.contact_forms.count_documents({})
+        
+        # Get social engagement
+        social_stats = await db.social_shares.aggregate([
+            {"$group": {"_id": "$platform", "shares": {"$sum": 1}}}
+        ]).to_list(10)
+        
+        return {
+            "page_views": views,
+            "contact_submissions": contacts,  
+            "social_engagement": social_stats,
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logging.error(f"Performance data error: {str(e)}")
+        return {"error": "Failed to get performance data"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
