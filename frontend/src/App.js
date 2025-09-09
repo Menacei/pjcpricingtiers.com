@@ -558,8 +558,8 @@ function App() {
     script.text = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "PJC Web Designs - Affordable Website Design for Startups",
-      "description": "Professional website design for startups and growing businesses starting at $259",
+      "name": "PJC Web Designs - Professional Website Design for Startups",
+      "description": "Professional website design for startups and growing businesses starting at $324.99",
       "url": window.location.href,
       "mainEntity": {
         "@type": "WebDesignCompany",
