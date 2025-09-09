@@ -1018,10 +1018,10 @@ function App() {
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>
-      </div>
+        </section>
 
-      {/* Contact Section */}
-      <div className="bg-slate-800/30 py-20">
+        {/* Contact Section */}
+        <section className="bg-slate-800/30 py-20" id="contact">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-6">
