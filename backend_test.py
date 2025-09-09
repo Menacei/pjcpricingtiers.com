@@ -448,10 +448,16 @@ class PJCBackendTester:
             return False
         
         # Test Robots.txt
+        print(f"\n🔍 Testing Robots.txt...")
+        print(f"   URL: {self.api_url}/robots.txt")
         try:
             url = f"{self.api_url}/robots.txt"
             response = requests.get(url, timeout=30)
             if response.status_code == 200:
+                self.tests_run += 1
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                
                 robots_content = response.text
                 
                 # Check for required robots.txt elements
@@ -471,11 +477,13 @@ class PJCBackendTester:
                 
                 print("✅ Robots.txt contains all required directives")
             else:
-                print(f"❌ Robots.txt request failed with status: {response.status_code}")
+                self.tests_run += 1
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
                 return False
                 
         except Exception as e:
-            print(f"❌ Error testing robots.txt: {str(e)}")
+            self.tests_run += 1
+            print(f"❌ Failed - Error: {str(e)}")
             return False
         
         # Test SEO Meta endpoint
