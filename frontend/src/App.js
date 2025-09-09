@@ -1180,6 +1180,26 @@ function App() {
             </div>
             
             <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Contact</h4>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-gray-400 text-sm mb-1">Email us directly:</p>
+                  <a 
+                    href="mailto:Patrickjchurch04@gmail.com" 
+                    className="text-cyan-400 hover:text-cyan-300 transition-colors text-sm break-all"
+                  >
+                    Patrickjchurch04@gmail.com
+                  </a>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">
+                    Response time: 24 hours
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div>
               <h4 className="text-lg font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-2">
                 <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">About</Button></li>
