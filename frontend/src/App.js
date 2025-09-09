@@ -928,10 +928,10 @@ function App() {
             </Card>
           ))}
         </div>
-      </div>
+        </section>
 
-      {/* Blog Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        {/* Blog Section */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" id="blog">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Latest Insights
