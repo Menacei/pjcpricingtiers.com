@@ -50,6 +50,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState("");
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState(null);
   const [blogPosts, setBlogPosts] = useState([]);
   const [socialPlatforms, setSocialPlatforms] = useState([]);
   const [contactForm, setContactForm] = useState({
