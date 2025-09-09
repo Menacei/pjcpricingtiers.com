@@ -334,6 +334,24 @@ function App() {
     }
   };
 
+  // Social media platform URLs
+  const socialMediaLinks = {
+    facebook: "https://www.facebook.com/pjcwebdesigns",
+    twitter: "https://www.twitter.com/pjcwebdesigns", 
+    linkedin: "https://www.linkedin.com/company/pjcwebdesigns",
+    instagram: "https://www.instagram.com/pjcwebdesigns",
+    pinterest: "https://www.pinterest.com/pjcwebdesigns",
+    reddit: "https://www.reddit.com/user/pjcwebdesigns",
+    whatsapp: "https://wa.me/message/ABCDEFGHIJKLMNOP1",
+    telegram: "https://t.me/pjcwebdesigns"
+  };
+
+  // Function to open social media platform
+  const openSocialPlatform = (platform) => {
+    const url = socialMediaLinks[platform] || `https://www.${platform}.com`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   // Function to get platform-specific styling
   const getPlatformStyling = (platform) => {
     const styles = {
