@@ -350,12 +350,12 @@ function App() {
     {
       id: "starter",
       name: "Startup Launch",
-      price: "Starting at $259.99",
-      basePrice: "$259.99",
+      price: "Starting at $324.99",
+      basePrice: "$324.99",
       priceNote: "Final price varies by page count",
       features: [
         "3-page modern website (base price)",
-        "Additional pages: +$85 each",
+        "Additional pages: +$106.25 each",
         "Mobile-responsive design",
         "Basic SEO optimization",
         "Contact form & social links",
@@ -369,12 +369,12 @@ function App() {
     {
       id: "growth",
       name: "Business Growth",
-      price: "Starting at $649.99",
-      basePrice: "$649.99",
+      price: "Starting at $812.49",
+      basePrice: "$812.49",
       priceNote: "Final price varies by page count",
       features: [
         "Up to 8 custom pages (base price)",
-        "Additional pages: +$80 each",
+        "Additional pages: +$100 each",
         "Modern animations",
         "Blog integration",
         "Advanced SEO setup",
@@ -390,12 +390,12 @@ function App() {
     {
       id: "scale",
       name: "Scale & Expand",
-      price: "Starting at $1,299.99",
-      basePrice: "$1,299.99",
+      price: "Starting at $1,624.99",
+      basePrice: "$1,624.99",
       priceNote: "Final price varies by page count",
       features: [
         "Up to 15 pages (base price)",
-        "Additional pages: +$75 each",
+        "Additional pages: +$93.75 each",
         "E-commerce functionality",
         "CMS for easy updates",
         "Advanced integrations",
