@@ -1005,9 +1005,18 @@ function App() {
             <h2 className="text-4xl font-bold text-white mb-6">
               Let's Create Something Amazing
             </h2>
-            <p className="text-xl text-gray-400">
+            <p className="text-xl text-gray-400 mb-4">
               Ready to transform your digital presence? Get in touch and let's discuss your project.
             </p>
+            <div className="flex items-center justify-center space-x-2 text-lg">
+              <span className="text-gray-300">Contact us directly:</span>
+              <a 
+                href="mailto:Patrickjchurch04@gmail.com" 
+                className="text-cyan-400 hover:text-cyan-300 transition-colors font-semibold underline"
+              >
+                Patrickjchurch04@gmail.com
+              </a>
+            </div>
           </div>
 
           <Card className="bg-slate-800/50 border-slate-700">
