@@ -704,24 +704,108 @@ function App() {
         </div>
       </div>
 
+      {/* Social Media Integration Section */}
+      <div className="bg-slate-800/50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Connect With Us
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Stay connected and follow our latest projects, insights, and industry updates across all major social platforms.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+            {socialPlatforms.map((platform) => (
+              <Card key={platform.id} className="bg-slate-700/50 border-slate-600 hover:border-cyan-400 transition-all duration-300 group">
+                <CardContent className="p-4 text-center">
+                  <div 
+                    className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300"
+                    style={{ backgroundColor: `${platform.color}20`, border: `2px solid ${platform.color}` }}
+                  >
+                    <div style={{ color: platform.color }}>
+                      {getSocialIcon(platform.id)}
+                    </div>
+                  </div>
+                  <h3 className="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors">
+                    {platform.name}
+                  </h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 text-gray-400 hover:text-cyan-400"
+                    onClick={() => handleSocialShare(platform.id, 'pjc-web-designs')}
+                  >
+                    Follow
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Footer */}
       <footer className="bg-slate-900 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
-              PJC Web Designs
-            </h3>
-            <p className="text-gray-400 mb-6">
-              Crafting digital experiences that merge urban aesthetics with cutting-edge technology.
-            </p>
-            <div className="flex justify-center space-x-6">
-              <Button variant="ghost" className="text-gray-400 hover:text-cyan-400">Privacy</Button>
-              <Button variant="ghost" className="text-gray-400 hover:text-cyan-400">Terms</Button>
-              <Button variant="ghost" className="text-gray-400 hover:text-cyan-400">Contact</Button>
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div className="md:col-span-2">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                PJC Web Designs
+              </h3>
+              <p className="text-gray-400 mb-6">
+                Crafting digital experiences that merge urban aesthetics with cutting-edge technology. 
+                We don't just build websites – we create digital ecosystems.
+              </p>
+              <div className="flex space-x-4">
+                {socialPlatforms.slice(0, 6).map((platform) => (
+                  <Button
+                    key={platform.id}
+                    variant="ghost"
+                    size="sm"
+                    className="h-10 w-10 p-0 rounded-full border border-slate-700 hover:border-cyan-400 text-gray-400 hover:text-cyan-400"
+                    onClick={() => handleSocialShare(platform.id, 'pjc-web-designs')}
+                    title={`Follow us on ${platform.name}`}
+                  >
+                    {getSocialIcon(platform.id)}
+                  </Button>
+                ))}
+              </div>
             </div>
-            <p className="text-gray-500 mt-8">
-              © 2025 PJC Web Designs. All rights reserved.
-            </p>
+            
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Services</h4>
+              <ul className="space-y-2">
+                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Web Design</Button></li>
+                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Development</Button></li>
+                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">E-commerce</Button></li>
+                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">SEO</Button></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Company</h4>
+              <ul className="space-y-2">
+                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">About</Button></li>
+                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Blog</Button></li>
+                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Careers</Button></li>
+                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Contact</Button></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-slate-800 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-gray-500 mb-4 md:mb-0">
+                © 2025 PJC Web Designs. All rights reserved.
+              </p>
+              <div className="flex space-x-6">
+                <Button variant="ghost" className="text-gray-400 hover:text-cyan-400">Privacy Policy</Button>
+                <Button variant="ghost" className="text-gray-400 hover:text-cyan-400">Terms of Service</Button>
+                <Button variant="ghost" className="text-gray-400 hover:text-cyan-400">Cookie Policy</Button>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
