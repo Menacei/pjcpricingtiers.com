@@ -1119,21 +1119,10 @@ function App() {
               <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
                 PJC Web Designs
               </h3>
-              <p className="text-gray-400 mb-4">
-                Crafting digital experiences that merge urban aesthetics with cutting-edge technology. 
-                We don't just build websites – we create digital ecosystems.
+              <p className="text-gray-400 mb-6">
+                Empowering startups and growing businesses with affordable, professional websites. 
+                We believe every entrepreneur deserves a stunning online presence, regardless of budget.
               </p>
-              <div className="mb-6">
-                <p className="text-gray-300 mb-2">
-                  <span className="text-cyan-400 font-semibold">Get in touch:</span>
-                </p>
-                <a 
-                  href="mailto:Patrickjchurch04@gmail.com" 
-                  className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
-                >
-                  Patrickjchurch04@gmail.com
-                </a>
-              </div>
               <div className="flex space-x-4">
                 {socialPlatforms.slice(0, 6).map((platform) => (
                   <Button
