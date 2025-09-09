@@ -160,9 +160,9 @@ class SocialMediaPostCreate(BaseModel):
 
 # Fixed pricing packages (SECURITY: Never allow frontend to set prices)
 PACKAGES = {
-    "essential": 599.99,
-    "professional": 2999.99,
-    "enterprise": 10000.0
+    "starter": 199.99,
+    "growth": 499.99,
+    "scale": 999.99
 }
 
 # PayPal Environment Setup
