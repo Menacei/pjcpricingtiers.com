@@ -861,8 +861,9 @@ async def create_paypal_order(request: PayPalOrderRequest):
         if request.package_id not in PACKAGES:
             raise HTTPException(status_code=400, detail="Invalid package selected")
         
-        # Get amount from server-side definition only (SECURITY)
-        amount = PACKAGES[request.package_id]
+        # Calculate amount from server-side definition only (SECURITY)
+        pricing = calculate_package_price(request.package_id, request.total_pages)
+        amount = pricing["final_price"]
         
         # Get PayPal client
         paypal_client = get_paypal_client()
