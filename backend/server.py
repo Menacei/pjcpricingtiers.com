@@ -444,6 +444,156 @@ async def get_packages():
         ]
     }
 
+# Blog endpoints
+@api_router.get("/blog", response_model=List[BlogPost])
+async def get_blog_posts(limit: int = 10, category: Optional[str] = None):
+    try:
+        filter_query = {"published": True}
+        if category:
+            filter_query["category"] = category
+            
+        posts = await db.blog_posts.find(filter_query).sort("timestamp", -1).limit(limit).to_list(limit)
+        
+        for post in posts:
+            if isinstance(post.get('timestamp'), str):
+                post['timestamp'] = datetime.fromisoformat(post['timestamp'])
+        
+        return [BlogPost(**post) for post in posts]
+    except Exception as e:
+        logging.error(f"Get blog posts error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get blog posts")
+
+@api_router.get("/blog/{slug}")
+async def get_blog_post(slug: str):
+    try:
+        post = await db.blog_posts.find_one({"slug": slug, "published": True})
+        if not post:
+            raise HTTPException(status_code=404, detail="Blog post not found")
+        
+        if isinstance(post.get('timestamp'), str):
+            post['timestamp'] = datetime.fromisoformat(post['timestamp'])
+            
+        return BlogPost(**post)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Get blog post error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get blog post")
+
+@api_router.post("/blog", response_model=BlogPost)
+async def create_blog_post(post_data: BlogPostCreate):
+    try:
+        # Generate slug from title
+        slug = post_data.title.lower().replace(" ", "-").replace(",", "").replace(".", "")
+        slug = "".join(c for c in slug if c.isalnum() or c == "-")
+        
+        blog_post = BlogPost(
+            **post_data.dict(),
+            slug=slug
+        )
+        
+        post_dict = blog_post.dict()
+        post_dict['timestamp'] = post_dict['timestamp'].isoformat()
+        await db.blog_posts.insert_one(post_dict)
+        
+        return blog_post
+    except Exception as e:
+        logging.error(f"Create blog post error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create blog post")
+
+@api_router.get("/blog/categories")
+async def get_blog_categories():
+    try:
+        categories = await db.blog_posts.distinct("category", {"published": True})
+        return {"categories": categories}
+    except Exception as e:
+        logging.error(f"Get blog categories error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get blog categories")
+
+# Social media endpoints
+@api_router.post("/social/share")
+async def track_social_share(post_id: str, platform: str):
+    try:
+        # Generate share URLs based on platform
+        base_url = "https://pjc-pricing-tiers.preview.emergentagent.com"
+        post_url = f"{base_url}/blog/{post_id}"
+        
+        share_urls = {
+            "facebook": f"https://www.facebook.com/sharer/sharer.php?u={post_url}",
+            "twitter": f"https://twitter.com/intent/tweet?url={post_url}&text=Check out this article from PJC Web Designs!",
+            "linkedin": f"https://www.linkedin.com/sharing/share-offsite/?url={post_url}",
+            "instagram": f"https://www.instagram.com/",  # Instagram doesn't support direct URL sharing
+            "pinterest": f"https://pinterest.com/pin/create/button/?url={post_url}",
+            "reddit": f"https://reddit.com/submit?url={post_url}&title=PJC Web Designs Article",
+            "whatsapp": f"https://wa.me/?text=Check out this article: {post_url}",
+            "telegram": f"https://t.me/share/url?url={post_url}&text=PJC Web Designs Article"
+        }
+        
+        if platform not in share_urls:
+            raise HTTPException(status_code=400, detail="Unsupported social platform")
+        
+        # Track the share
+        social_share = SocialShare(
+            post_id=post_id,
+            platform=platform,
+            share_url=share_urls[platform]
+        )
+        
+        share_dict = social_share.dict()
+        share_dict['timestamp'] = share_dict['timestamp'].isoformat()
+        await db.social_shares.insert_one(share_dict)
+        
+        # Update click count
+        await db.social_shares.update_one(
+            {"id": social_share.id},
+            {"$inc": {"clicks": 1}}
+        )
+        
+        return {
+            "share_url": share_urls[platform],
+            "platform": platform
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Social share error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create social share")
+
+@api_router.get("/social/platforms")
+async def get_social_platforms():
+    """Get available social media platforms for sharing"""
+    return {
+        "platforms": [
+            {"id": "facebook", "name": "Facebook", "icon": "facebook", "color": "#1877F2"},
+            {"id": "twitter", "name": "Twitter", "icon": "twitter", "color": "#1DA1F2"},
+            {"id": "linkedin", "name": "LinkedIn", "icon": "linkedin", "color": "#0A66C2"},
+            {"id": "instagram", "name": "Instagram", "icon": "instagram", "color": "#E4405F"},
+            {"id": "pinterest", "name": "Pinterest", "icon": "pinterest", "color": "#BD081C"},
+            {"id": "reddit", "name": "Reddit", "icon": "reddit", "color": "#FF4500"},
+            {"id": "whatsapp", "name": "WhatsApp", "icon": "whatsapp", "color": "#25D366"},
+            {"id": "telegram", "name": "Telegram", "icon": "telegram", "color": "#0088CC"}
+        ]
+    }
+
+@api_router.get("/social/stats")
+async def get_social_stats():
+    """Get social media sharing statistics"""
+    try:
+        stats = await db.social_shares.aggregate([
+            {
+                "$group": {
+                    "_id": "$platform",
+                    "total_shares": {"$sum": 1},
+                    "total_clicks": {"$sum": "$clicks"}
+                }
+            }
+        ]).to_list(None)
+        
+        return {"stats": stats}
+    except Exception as e:
+        logging.error(f"Social stats error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get social stats")
+
 # Include the router in the main app
 app.include_router(api_router)
 
