@@ -563,6 +563,23 @@ function App() {
                 View Portfolio
               </Button>
             </div>
+            
+            {/* Subtle affiliate integration */}
+            <div className="mt-8 text-center">
+              <p className="text-gray-500 text-sm">
+                Trusted by professionals who use 
+                <a 
+                  href="https://www.jdoqocy.com/click-101532092-17143106" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-cyan-400 hover:text-cyan-300 mx-1 underline"
+                >
+                  AOMEI
+                </a>
+                for data protection
+              </p>
+              <img src="https://www.tqlkg.com/image-101532092-17143106" width="1" height="1" style={{border: 0, position: 'absolute', left: '-9999px'}} alt="" />
+            </div>
           </div>
         </div>
         
