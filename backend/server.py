@@ -134,6 +134,18 @@ PACKAGES = {
     "enterprise": 10000.0
 }
 
+# PayPal Environment Setup
+def get_paypal_client():
+    client_id = os.environ.get('PAYPAL_CLIENT_ID')
+    client_secret = os.environ.get('PAYPAL_SECRET')
+    
+    if not client_id or not client_secret:
+        raise HTTPException(status_code=500, detail="PayPal configuration error")
+    
+    # Use sandbox for testing, live for production
+    environment = SandboxEnvironment(client_id=client_id, client_secret=client_secret)
+    return environment.client()
+
 # Sample blog posts data
 SAMPLE_BLOG_POSTS = [
     {
