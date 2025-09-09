@@ -918,8 +918,9 @@ function App() {
               <div className="relative overflow-hidden">
                 <img 
                   src={post.featured_image} 
-                  alt={post.title}
+                  alt={`${post.title} - ${post.excerpt.substring(0, 100)}...`}
                   className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                  loading="lazy"
                 />
                 <div className="absolute top-4 left-4">
                   <Badge className="bg-cyan-600 text-white">
