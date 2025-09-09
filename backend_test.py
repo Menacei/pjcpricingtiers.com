@@ -515,11 +515,7 @@ class PJCBackendTester:
         print("✅ SEO meta data endpoint working with correct structure")
         
         # Test Analytics Page View Tracking
-        page_view_data = {
-            "page": "/",
-            "referrer": "https://google.com"
-        }
-        success, response = self.run_test("Track Page View", "POST", "analytics/page-view", 200, page_view_data)
+        success, response = self.run_test("Track Page View", "POST", "analytics/page-view?page=/&referrer=https://google.com", 200)
         if not success:
             return False
             
