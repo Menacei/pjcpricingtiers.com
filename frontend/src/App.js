@@ -564,30 +564,11 @@ function App() {
               </Button>
             </div>
             
-            {/* Contact and trust info */}
-            <div className="mt-8 text-center space-y-2">
-              <div className="flex items-center justify-center space-x-2">
-                <span className="text-gray-300">✉️</span>
-                <a 
-                  href="mailto:Patrickjchurch04@gmail.com" 
-                  className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
-                >
-                  Patrickjchurch04@gmail.com
-                </a>
-              </div>
+            {/* Trust info */}
+            <div className="mt-8 text-center">
               <p className="text-gray-500 text-sm">
-                Trusted by professionals who use 
-                <a 
-                  href="https://www.jdoqocy.com/click-101532092-17143106" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-cyan-400 hover:text-cyan-300 mx-1 underline"
-                >
-                  AOMEI
-                </a>
-                for data protection
+                Trusted by startups and growing businesses ✨
               </p>
-              <img src="https://www.tqlkg.com/image-101532092-17143106" width="1" height="1" style={{border: 0, position: 'absolute', left: '-9999px'}} alt="" />
             </div>
           </div>
         </div>
