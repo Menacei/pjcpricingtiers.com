@@ -397,10 +397,9 @@ class PJCBackendTester:
         """Test SEO-related endpoints"""
         print("\n🔍 Testing SEO Endpoints...")
         
-        # Test XML Sitemap
-        success, response = self.run_test("XML Sitemap", "GET", "sitemap.xml", 200, headers={'Accept': 'application/xml'})
-        if not success:
-            return False
+        # Test XML Sitemap - handle separately since it returns XML, not JSON
+        print(f"\n🔍 Testing XML Sitemap...")
+        print(f"   URL: {self.api_url}/sitemap.xml")
             
         # For XML response, we need to check the text content
         try:
