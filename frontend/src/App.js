@@ -534,6 +534,95 @@ function App() {
         </div>
       </div>
 
+      {/* Blog Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Latest Insights
+          </h2>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            Stay updated with the latest trends in web design, development, and digital innovation.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {blogPosts.map((post, index) => (
+            <Card key={index} className="bg-slate-800/50 border-slate-700 hover:border-cyan-400 transition-all duration-300 group overflow-hidden">
+              <div className="relative overflow-hidden">
+                <img 
+                  src={post.featured_image} 
+                  alt={post.title}
+                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+                <div className="absolute top-4 left-4">
+                  <Badge className="bg-cyan-600 text-white">
+                    {post.category}
+                  </Badge>
+                </div>
+              </div>
+              <CardContent className="p-6">
+                <div className="flex items-center text-gray-400 text-sm mb-3 space-x-4">
+                  <div className="flex items-center">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    {new Date(post.timestamp).toLocaleDateString()}
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="w-4 h-4 mr-1" />
+                    {post.reading_time} min read
+                  </div>
+                </div>
+                
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
+                  {post.title}
+                </h3>
+                
+                <p className="text-gray-400 mb-4 line-clamp-3">
+                  {post.excerpt}
+                </p>
+                
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {post.tags.slice(0, 3).map((tag, idx) => (
+                    <Badge key={idx} variant="secondary" className="bg-slate-700 text-gray-300">
+                      <Tag className="w-3 h-3 mr-1" />
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-gray-400">
+                    <User className="w-4 h-4 mr-2" />
+                    <span className="text-sm">{post.author}</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    {socialPlatforms.slice(0, 4).map((platform) => (
+                      <Button
+                        key={platform.id}
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-cyan-400"
+                        onClick={() => handleSocialShare(platform.id, post.slug)}
+                        title={`Share on ${platform.name}`}
+                      >
+                        {getSocialIcon(platform.id)}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <Button variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900">
+            View All Articles
+            <ArrowRight className="ml-2 w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
       {/* Contact Section */}
       <div className="bg-slate-800/30 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
