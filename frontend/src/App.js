@@ -350,7 +350,7 @@ function App() {
     {
       id: "starter",
       name: "Startup Launch",
-      price: "$199.99",
+      price: "$259.99",
       features: [
         "3-page modern website",
         "Mobile-responsive design",
@@ -366,7 +366,7 @@ function App() {
     {
       id: "growth",
       name: "Business Growth",
-      price: "$499.99",
+      price: "$649.99",
       features: [
         "Up to 8 custom pages",
         "Modern animations",
@@ -384,7 +384,7 @@ function App() {
     {
       id: "scale",
       name: "Scale & Expand",
-      price: "$999.99",
+      price: "$1,299.99",
       features: [
         "Up to 15 pages",
         "E-commerce functionality",
