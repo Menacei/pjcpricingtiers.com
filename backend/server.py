@@ -85,9 +85,15 @@ class CheckoutRequest(BaseModel):
     package_id: str
     origin_url: str
     customer_email: Optional[str] = None
+    payment_method: str = "stripe"  # "stripe" or "paypal"
 
 class PaymentStatusRequest(BaseModel):
     session_id: str
+
+class PayPalOrderRequest(BaseModel):
+    package_id: str
+    origin_url: str
+    customer_email: Optional[str] = None
 
 class BlogPost(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
