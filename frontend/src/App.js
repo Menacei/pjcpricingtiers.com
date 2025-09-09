@@ -275,8 +275,39 @@ function App() {
     { name: "E-commerce Solutions", link: "https://example.com/partner3", clicks: 0 }
   ];
 
+  // Payment Status Display Component
+  const PaymentStatusDisplay = () => {
+    if (!paymentStatus) return null;
+
+    const statusStyles = {
+      success: "bg-green-500/20 border-green-500 text-green-300",
+      error: "bg-red-500/20 border-red-500 text-red-300",
+      pending: "bg-yellow-500/20 border-yellow-500 text-yellow-300"
+    };
+
+    return (
+      <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 p-4 rounded-lg border ${statusStyles[paymentStatus.type]} max-w-md w-full mx-4`}>
+        <div className="flex items-center space-x-2">
+          {paymentStatus.type === 'pending' && <Loader2 className="w-5 h-5 animate-spin" />}
+          {paymentStatus.type === 'success' && <CheckCircle className="w-5 h-5" />}
+          {paymentStatus.type === 'error' && <X className="w-5 h-5" />}
+          <p className="text-sm font-medium">{paymentStatus.message}</p>
+        </div>
+        {paymentStatus.type !== 'pending' && (
+          <button
+            onClick={() => setPaymentStatus(null)}
+            className="absolute top-2 right-2 text-current hover:opacity-70"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <PaymentStatusDisplay />
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10"></div>
