@@ -342,7 +342,7 @@ class PJCBackendTester:
         
         # Test creating PayPal order
         paypal_order_data = {
-            "package_id": "professional",
+            "package_id": "growth",
             "origin_url": "https://pjc-pricing-tiers.preview.emergentagent.com",
             "customer_email": "test@example.com"
         }
