@@ -312,6 +312,22 @@ async def initialize_blog_posts():
     except Exception as e:
         logging.error(f"Failed to initialize blog posts: {str(e)}")
 
+async def initialize_social_posts():
+    """Initialize sample social media posts if none exist"""
+    try:
+        existing_posts = await db.social_media_posts.count_documents({})
+        if existing_posts == 0:
+            for post_data in SAMPLE_SOCIAL_POSTS:
+                social_post = SocialMediaPost(**post_data)
+                
+                post_dict = social_post.dict()
+                post_dict['timestamp'] = post_dict['timestamp'].isoformat()
+                await db.social_media_posts.insert_one(post_dict)
+            
+            logging.info("Sample social media posts initialized")
+    except Exception as e:
+        logging.error(f"Failed to initialize social media posts: {str(e)}")
+
 # Existing routes
 @api_router.get("/")
 async def root():
