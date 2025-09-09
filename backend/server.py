@@ -1000,6 +1000,95 @@ async def paypal_webhook(request: Request):
         logging.error(f"PayPal webhook processing error: {str(e)}")
         raise HTTPException(status_code=500, detail="PayPal webhook processing failed")
 
+# Social Media Content Endpoints
+@api_router.get("/social/posts", response_model=List[SocialMediaPost])
+async def get_social_media_posts(limit: int = 6, featured: Optional[bool] = None):
+    try:
+        filter_query = {"published": True}
+        if featured is not None:
+            filter_query["featured"] = featured
+            
+        posts = await db.social_media_posts.find(filter_query).sort("timestamp", -1).limit(limit).to_list(limit)
+        
+        for post in posts:
+            if isinstance(post.get('timestamp'), str):
+                post['timestamp'] = datetime.fromisoformat(post['timestamp'])
+        
+        return [SocialMediaPost(**post) for post in posts]
+    except Exception as e:
+        logging.error(f"Get social media posts error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get social media posts")
+
+@api_router.post("/social/posts", response_model=SocialMediaPost)
+async def create_social_media_post(post_data: SocialMediaPostCreate):
+    try:
+        social_post = SocialMediaPost(**post_data.dict())
+        
+        post_dict = social_post.dict()
+        post_dict['timestamp'] = post_dict['timestamp'].isoformat()
+        await db.social_media_posts.insert_one(post_dict)
+        
+        return social_post
+    except Exception as e:
+        logging.error(f"Create social media post error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create social media post")
+
+@api_router.get("/social/posts/{post_id}")
+async def get_social_media_post(post_id: str):
+    try:
+        post = await db.social_media_posts.find_one({"id": post_id, "published": True})
+        if not post:
+            raise HTTPException(status_code=404, detail="Social media post not found")
+        
+        if isinstance(post.get('timestamp'), str):
+            post['timestamp'] = datetime.fromisoformat(post['timestamp'])
+            
+        return SocialMediaPost(**post)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Get social media post error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get social media post")
+
+@api_router.post("/social/posts/{post_id}/engage")
+async def engage_with_post(post_id: str, action: str):
+    """Track engagement with social media posts (like, comment, share)"""
+    try:
+        if action not in ["like", "comment", "share"]:
+            raise HTTPException(status_code=400, detail="Invalid engagement action")
+        
+        # Increment the engagement counter
+        update_field = f"{action}s"
+        await db.social_media_posts.update_one(
+            {"id": post_id},
+            {"$inc": {update_field: 1}}
+        )
+        
+        return {"message": f"Engagement tracked for {action}", "action": action}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Post engagement error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to track engagement")
+
+@api_router.get("/social/featured")
+async def get_featured_social_posts():
+    """Get featured social media posts for homepage display"""
+    try:
+        posts = await db.social_media_posts.find({
+            "published": True,
+            "featured": True
+        }).sort("timestamp", -1).limit(3).to_list(3)
+        
+        for post in posts:
+            if isinstance(post.get('timestamp'), str):
+                post['timestamp'] = datetime.fromisoformat(post['timestamp'])
+        
+        return [SocialMediaPost(**post) for post in posts]
+    except Exception as e:
+        logging.error(f"Get featured social posts error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get featured social posts")
+
 # Include the router in the main app
 app.include_router(api_router)
 
