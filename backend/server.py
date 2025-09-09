@@ -677,6 +677,209 @@ async def get_social_stats():
         logging.error(f"Social stats error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get social stats")
 
+# PayPal Payment Endpoints
+@api_router.post("/paypal/orders")
+async def create_paypal_order(request: PayPalOrderRequest):
+    try:
+        # Validate package exists
+        if request.package_id not in PACKAGES:
+            raise HTTPException(status_code=400, detail="Invalid package selected")
+        
+        # Get amount from server-side definition only (SECURITY)
+        amount = PACKAGES[request.package_id]
+        
+        # Get PayPal client
+        paypal_client = get_paypal_client()
+        
+        # Create PayPal order
+        create_order_request = OrdersCreateRequest()
+        create_order_request.prefer('return=representation')
+        create_order_request.request_body = {
+            "intent": "CAPTURE",
+            "purchase_units": [{
+                "reference_id": request.package_id,
+                "amount": {
+                    "currency_code": "USD", 
+                    "value": f"{amount:.2f}"
+                },
+                "description": f"PJC Web Designs - {request.package_id.title()} Package"
+            }],
+            "application_context": {
+                "return_url": f"{request.origin_url}/success",
+                "cancel_url": f"{request.origin_url}/cancel",
+                "brand_name": "PJC Web Designs",
+                "landing_page": "BILLING",
+                "user_action": "PAY_NOW"
+            }
+        }
+
+        response = paypal_client.execute(create_order_request)
+        order = response.result
+        
+        # Create transaction record BEFORE redirect (MANDATORY)
+        transaction = PaymentTransaction(
+            package_id=request.package_id,
+            amount=amount,
+            currency="usd",
+            session_id=order.id,  # Use PayPal order ID as session ID
+            payment_status="pending",
+            status="initiated",
+            metadata={
+                "payment_method": "paypal",
+                "package_id": request.package_id,
+                "customer_email": request.customer_email or ""
+            },
+            customer_email=request.customer_email
+        )
+        
+        transaction_dict = transaction.dict()
+        transaction_dict['timestamp'] = transaction_dict['timestamp'].isoformat()
+        await db.payment_transactions.insert_one(transaction_dict)
+        
+        # Find approval URL
+        approval_url = None
+        for link in order.links:
+            if link.rel == "approve":
+                approval_url = link.href
+                break
+        
+        return {
+            "order_id": order.id,
+            "approval_url": approval_url,
+            "status": order.status
+        }
+        
+    except PayPalHttpError as e:
+        logging.error(f"PayPal API error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"PayPal error: {str(e)}")
+    except Exception as e:
+        logging.error(f"PayPal order creation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create PayPal order: {str(e)}")
+
+@api_router.post("/paypal/orders/{order_id}/capture")
+async def capture_paypal_order(order_id: str):
+    try:
+        # Get PayPal client
+        paypal_client = get_paypal_client()
+        
+        # Capture the order
+        capture_request = OrdersCaptureRequest(order_id)
+        response = paypal_client.execute(capture_request)
+        order = response.result
+        
+        # Update transaction status if payment successful and not already processed
+        if order.status == "COMPLETED":
+            # Check if already processed to prevent double processing
+            existing_transaction = await db.payment_transactions.find_one({
+                "session_id": order_id,
+                "payment_status": "paid"
+            })
+            
+            if not existing_transaction:
+                # Update transaction status
+                await db.payment_transactions.update_one(
+                    {"session_id": order_id},
+                    {
+                        "$set": {
+                            "payment_status": "paid",
+                            "status": "completed",
+                            "updated_at": datetime.now(timezone.utc).isoformat()
+                        }
+                    }
+                )
+                logging.info(f"PayPal payment successful for order {order_id}")
+        
+        return {
+            "order_id": order.id,
+            "status": order.status,
+            "amount": order.purchase_units[0].payments.captures[0].amount.value if order.purchase_units[0].payments.captures else 0,
+            "currency": order.purchase_units[0].payments.captures[0].amount.currency_code if order.purchase_units[0].payments.captures else "USD"
+        }
+        
+    except PayPalHttpError as e:
+        logging.error(f"PayPal capture error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"PayPal capture error: {str(e)}")
+    except Exception as e:
+        logging.error(f"PayPal capture error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to capture PayPal order: {str(e)}")
+
+@api_router.get("/paypal/orders/{order_id}")
+async def get_paypal_order_status(order_id: str):
+    try:
+        # Get PayPal client
+        paypal_client = get_paypal_client()
+        
+        # Get order details from PayPal
+        from paypalcheckoutsdk.orders import OrdersGetRequest
+        get_request = OrdersGetRequest(order_id)
+        response = paypal_client.execute(get_request)
+        order = response.result
+        
+        # Update database record if payment successful and not already processed
+        if order.status == "COMPLETED":
+            existing_transaction = await db.payment_transactions.find_one({
+                "session_id": order_id,
+                "payment_status": "paid"
+            })
+            
+            if not existing_transaction:
+                await db.payment_transactions.update_one(
+                    {"session_id": order_id},
+                    {
+                        "$set": {
+                            "payment_status": "paid",
+                            "status": "completed",
+                            "updated_at": datetime.now(timezone.utc).isoformat()
+                        }
+                    }
+                )
+        
+        return {
+            "order_id": order.id,
+            "status": order.status,
+            "payment_status": "paid" if order.status == "COMPLETED" else "pending"
+        }
+        
+    except PayPalHttpError as e:
+        logging.error(f"PayPal order status error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"PayPal order status error: {str(e)}")
+    except Exception as e:
+        logging.error(f"PayPal order status error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get PayPal order status: {str(e)}")
+
+@api_router.post("/paypal/webhook")
+async def paypal_webhook(request: Request):
+    try:
+        # Get the raw body
+        body = await request.body()
+        data = await request.json()
+        
+        # In production, you should validate the webhook signature
+        # For now, we'll process the webhook events
+        
+        if data.get("event_type") == "PAYMENT.CAPTURE.COMPLETED":
+            order_id = data["resource"]["supplementary_data"]["related_ids"]["order_id"]
+            
+            # Update transaction status
+            await db.payment_transactions.update_one(
+                {"session_id": order_id},
+                {
+                    "$set": {
+                        "payment_status": "paid",
+                        "status": "completed",
+                        "webhook_processed": True,
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            logging.info(f"PayPal webhook processed for order {order_id}")
+        
+        return {"status": "success"}
+        
+    except Exception as e:
+        logging.error(f"PayPal webhook processing error: {str(e)}")
+        raise HTTPException(status_code=500, detail="PayPal webhook processing failed")
+
 # Include the router in the main app
 app.include_router(api_router)
 
