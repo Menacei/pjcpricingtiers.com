@@ -1237,48 +1237,7 @@ function App() {
         </section>
       </main>
 
-      {/* Social Media Integration Section */}
-      <section className="bg-slate-800/50 py-16" id="connect">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Connect With Us
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Stay connected and follow our latest projects, insights, and industry updates across all major social platforms.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-            {socialPlatforms.map((platform) => (
-              <Card key={platform.id} className="bg-slate-700/50 border-slate-600 hover:border-cyan-400 transition-all duration-300 group">
-                <CardContent className="p-4 text-center">
-                  <div 
-                    className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 cursor-pointer"
-                    style={{ backgroundColor: `${platform.color}20`, border: `2px solid ${platform.color}` }}
-                    onClick={() => openSocialPlatform(platform.id)}
-                  >
-                    <div style={{ color: platform.color }}>
-                      {getSocialIcon(platform.id)}
-                    </div>
-                  </div>
-                  <h3 className="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors">
-                    {platform.name}
-                  </h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="mt-2 text-gray-400 hover:text-cyan-400"
-                    onClick={() => openSocialPlatform(platform.id)}
-                  >
-                    Follow
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="bg-slate-900 py-12">
