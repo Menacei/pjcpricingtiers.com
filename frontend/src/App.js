@@ -590,10 +590,10 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Choose Your Digital Journey
+            Startup-Friendly Pricing
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            From startup essentials to enterprise solutions, we've got the perfect package to elevate your digital presence.
+            Professional websites that grow with your business. No hidden fees, no surprises – just affordable, quality web design for entrepreneurs.
           </p>
         </div>
 
