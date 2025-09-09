@@ -1253,9 +1253,26 @@ function App() {
                   </a>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-gray-400 text-sm mb-2">
                     Response time: 24 hours
                   </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm mb-2">Social Media:</p>
+                  <div className="flex space-x-2">
+                    {['facebook', 'twitter', 'instagram', 'linkedin'].map((platform) => (
+                      <Button
+                        key={platform}
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 text-gray-400 hover:text-cyan-400"
+                        onClick={() => openSocialPlatform(platform)}
+                        title={platform.charAt(0).toUpperCase() + platform.slice(1)}
+                      >
+                        {getSocialIcon(platform)}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
