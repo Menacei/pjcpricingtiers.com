@@ -617,12 +617,21 @@ function App() {
               Starting at just $325 – final price determined by your page count and specific needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-4 text-lg">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-4 text-lg"
+                onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })}
+              >
                 Start Your Project
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button variant="outline" size="lg" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900 px-8 py-4 text-lg">
-                View Portfolio
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900 px-8 py-4 text-lg"
+                onClick={() => document.getElementById('examples').scrollIntoView({ behavior: 'smooth' })}
+              >
+                View Examples
               </Button>
             </div>
             
