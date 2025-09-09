@@ -348,55 +348,55 @@ function App() {
 
   const services = [
     {
-      id: "essential",
-      name: "Essential Web Presence",
-      price: "$599.99",
+      id: "starter",
+      name: "Startup Launch",
+      price: "$199.99",
       features: [
-        "5-page responsive website",
-        "Mobile-optimized design",
-        "Basic SEO setup",
-        "Contact form integration",
-        "Social media integration",
-        "30 days support"
-      ],
-      icon: <Globe className="w-8 h-8" />,
-      color: "from-cyan-400 to-blue-500"
-    },
-    {
-      id: "professional",
-      name: "Professional Business Suite",
-      price: "$2,999.99",
-      features: [
-        "Up to 15 custom pages",
-        "Advanced animations & interactions",
-        "E-commerce integration",
-        "CMS for easy updates",
-        "Advanced SEO & analytics",
-        "90 days premium support",
-        "Performance optimization",
-        "Security features"
+        "3-page modern website",
+        "Mobile-responsive design",
+        "Basic SEO optimization",
+        "Contact form & social links",
+        "Free domain setup help",
+        "30 days support",
+        "Perfect for new businesses"
       ],
       icon: <Rocket className="w-8 h-8" />,
-      color: "from-purple-400 to-pink-500",
+      color: "from-green-400 to-emerald-500"
+    },
+    {
+      id: "growth",
+      name: "Business Growth",
+      price: "$499.99",
+      features: [
+        "Up to 8 custom pages",
+        "Modern animations",
+        "Blog integration",
+        "Advanced SEO setup",
+        "Social media integration",
+        "Email marketing setup",
+        "60 days support",
+        "Analytics dashboard"
+      ],
+      icon: <Globe className="w-8 h-8" />,
+      color: "from-cyan-400 to-blue-500",
       popular: true
     },
     {
-      id: "enterprise",
-      name: "Enterprise Digital Ecosystem",
-      price: "$10,000",
+      id: "scale",
+      name: "Scale & Expand",
+      price: "$999.99",
       features: [
-        "Unlimited custom pages",
-        "Custom web application",
-        "API integrations",
-        "Advanced user management",
-        "Custom dashboard & analytics",
-        "1 year premium support",
-        "Dedicated project manager",
-        "Training & documentation",
-        "Regular maintenance & updates"
+        "Up to 15 pages",
+        "E-commerce functionality",
+        "CMS for easy updates",
+        "Advanced integrations",
+        "Performance optimization",
+        "Security features",
+        "90 days premium support",
+        "Monthly growth consultation"
       ],
       icon: <Shield className="w-8 h-8" />,
-      color: "from-orange-400 to-red-500"
+      color: "from-purple-400 to-pink-500"
     }
   ];
 
