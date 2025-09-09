@@ -66,6 +66,26 @@ class AffiliateLinkCreate(BaseModel):
     partner_name: str
     link: str
 
+class PaymentTransaction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    package_id: str
+    amount: float
+    currency: str = "usd"
+    session_id: Optional[str] = None
+    payment_status: str = "pending"
+    status: str = "initiated"
+    metadata: Optional[Dict[str, str]] = None
+    customer_email: Optional[str] = None
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CheckoutRequest(BaseModel):
+    package_id: str
+    origin_url: str
+    customer_email: Optional[str] = None
+
+class PaymentStatusRequest(BaseModel):
+    session_id: str
+
 # Existing routes
 @api_router.get("/")
 async def root():
