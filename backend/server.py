@@ -127,6 +127,37 @@ class SocialShare(BaseModel):
     clicks: int = 0
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class SocialMediaPost(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    platform: str
+    content: str
+    media_url: Optional[str] = None
+    media_type: str = "image"  # "image", "video", "carousel"
+    author_name: str = "PJC Web Designs"
+    author_avatar: Optional[str] = None
+    likes: int = 0
+    comments: int = 0
+    shares: int = 0
+    post_url: Optional[str] = None
+    hashtags: List[str] = []
+    featured: bool = False
+    published: bool = True
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SocialMediaPostCreate(BaseModel):
+    platform: str
+    content: str
+    media_url: Optional[str] = None
+    media_type: str = "image"
+    author_name: str = "PJC Web Designs"
+    author_avatar: Optional[str] = None
+    likes: int = 0
+    comments: int = 0
+    shares: int = 0
+    post_url: Optional[str] = None
+    hashtags: List[str] = []
+    featured: bool = False
+
 # Fixed pricing packages (SECURITY: Never allow frontend to set prices)
 PACKAGES = {
     "essential": 599.99,
