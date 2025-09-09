@@ -564,8 +564,17 @@ function App() {
               </Button>
             </div>
             
-            {/* Subtle affiliate integration */}
-            <div className="mt-8 text-center">
+            {/* Contact and trust info */}
+            <div className="mt-8 text-center space-y-2">
+              <div className="flex items-center justify-center space-x-2">
+                <span className="text-gray-300">✉️</span>
+                <a 
+                  href="mailto:Patrickjchurch04@gmail.com" 
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
+                >
+                  Patrickjchurch04@gmail.com
+                </a>
+              </div>
               <p className="text-gray-500 text-sm">
                 Trusted by professionals who use 
                 <a 
