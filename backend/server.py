@@ -86,6 +86,38 @@ class CheckoutRequest(BaseModel):
 class PaymentStatusRequest(BaseModel):
     session_id: str
 
+class BlogPost(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    slug: str
+    excerpt: str
+    content: str
+    author: str = "PJC Web Designs Team"
+    category: str
+    tags: List[str] = []
+    featured_image: Optional[str] = None
+    published: bool = True
+    reading_time: int = 5  # in minutes
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class BlogPostCreate(BaseModel):
+    title: str
+    excerpt: str
+    content: str
+    author: Optional[str] = "PJC Web Designs Team"
+    category: str
+    tags: List[str] = []
+    featured_image: Optional[str] = None
+    published: bool = True
+
+class SocialShare(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    post_id: str
+    platform: str
+    share_url: str
+    clicks: int = 0
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # Fixed pricing packages (SECURITY: Never allow frontend to set prices)
 PACKAGES = {
     "essential": 599.99,
