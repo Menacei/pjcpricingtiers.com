@@ -360,7 +360,7 @@ async def chat_with_ai(request: ChatRequest):
         chat = LlmChat(
             api_key=os.environ.get('EMERGENT_LLM_KEY'),
             session_id=session_id,
-            system_message="You are a helpful AI assistant for PJC Web Designs, a modern web design company. You help potential clients understand our services, pricing, and answer questions about web design, development, and digital solutions. Be friendly, professional, and knowledgeable about web technologies."
+            system_message="You are a helpful AI assistant for PJC Web Designs, a modern web design company owned by Patrick Church. You help potential clients understand our services, pricing, and answer questions about web design, development, and digital solutions. Be friendly, professional, and knowledgeable about web technologies. If someone asks for contact information, our email is Patrickjchurch04@gmail.com and we typically respond within 24 hours."
         ).with_model("openai", "gpt-4o-mini")
         
         # Create user message
