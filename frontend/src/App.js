@@ -628,11 +628,18 @@ function App() {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" id="pricing">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Startup-Friendly Pricing
+            Transparent Page-Based Pricing
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Professional websites that grow with your business. No hidden fees, no surprises – just affordable, quality web design for entrepreneurs.
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-4">
+            Professional websites that grow with your business. Clear pricing based on the number of pages you need.
           </p>
+          <div className="bg-slate-800/50 rounded-lg p-4 max-w-2xl mx-auto border border-cyan-400/30">
+            <p className="text-cyan-400 font-semibold mb-2">💡 How Pricing Works:</p>
+            <p className="text-gray-300 text-sm">
+              Each package includes a base number of pages. Need more? Simply add extra pages at our transparent per-page rates. 
+              <span className="text-cyan-400 font-medium"> Final total = Base price + (Extra pages × Per-page rate)</span>
+            </p>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
