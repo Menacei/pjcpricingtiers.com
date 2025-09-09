@@ -818,8 +818,10 @@ function App() {
           {affiliatePartners.map((partner, index) => (
             <Card key={index} className="bg-slate-800/50 border-slate-700 hover:border-cyan-400 transition-all duration-300">
               <CardContent className="p-6 text-center">
+                <Badge className="mb-3 bg-cyan-600/20 text-cyan-400">{partner.category}</Badge>
                 <h3 className="text-lg font-semibold text-white mb-2">{partner.name}</h3>
-                <p className="text-gray-400 mb-4">Clicks: {partner.clicks}</p>
+                <p className="text-gray-400 mb-4 text-sm">{partner.description}</p>
+                <p className="text-gray-500 mb-4 text-xs">Clicks: {partner.clicks}</p>
                 <Button 
                   variant="outline" 
                   className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900"
