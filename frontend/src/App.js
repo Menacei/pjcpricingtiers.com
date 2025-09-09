@@ -612,10 +612,11 @@ function App() {
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Services Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <main>
+        {/* Services Section */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" id="pricing">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Startup-Friendly Pricing
