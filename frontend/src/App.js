@@ -26,7 +26,16 @@ import {
   ArrowRight,
   ExternalLink,
   CreditCard,
-  Loader2
+  Loader2,
+  Calendar,
+  Clock,
+  Tag,
+  User,
+  Share2,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Instagram
 } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
