@@ -570,7 +570,7 @@ function App() {
       <PaymentStatusDisplay />
       <PaymentModal />
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
+      <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
