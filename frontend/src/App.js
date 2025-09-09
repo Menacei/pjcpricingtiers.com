@@ -24,7 +24,9 @@ import {
   Rocket,
   Shield,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  CreditCard,
+  Loader2
 } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
