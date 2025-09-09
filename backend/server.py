@@ -125,6 +125,68 @@ PACKAGES = {
     "enterprise": 10000.0
 }
 
+# Sample blog posts data
+SAMPLE_BLOG_POSTS = [
+    {
+        "title": "The Future of Web Design: Urban Tech Aesthetics",
+        "excerpt": "Explore how urban technology influences modern web design and creates engaging digital experiences.",
+        "content": "Urban tech aesthetics represent the convergence of metropolitan energy and cutting-edge technology. In web design, this translates to bold gradients, architectural imagery, and interactive elements that mirror the dynamism of city life...",
+        "category": "Design Trends",
+        "tags": ["web design", "urban tech", "aesthetics", "trends"],
+        "featured_image": "https://images.unsplash.com/photo-1707226845968-c7e5e3409e35",
+        "reading_time": 8
+    },
+    {
+        "title": "Stripe Integration Best Practices for Web Design Agencies",
+        "excerpt": "Learn how to implement secure and user-friendly payment systems for your web design business.",
+        "content": "Payment processing is crucial for web design agencies. Stripe offers robust APIs and security features that make collecting payments seamless for both businesses and clients...",
+        "category": "Development",
+        "tags": ["stripe", "payments", "web development", "business"],
+        "featured_image": "https://images.unsplash.com/photo-1559028012-481c04fa702d",
+        "reading_time": 6
+    },
+    {
+        "title": "AI Chatbots: Enhancing Customer Experience in Web Design",
+        "excerpt": "Discover how AI-powered chatbots can improve client communication and support for web design services.",
+        "content": "AI chatbots have revolutionized customer service in the web design industry. By implementing intelligent chat systems, agencies can provide 24/7 support and instantly answer common questions...",
+        "category": "AI & Technology",
+        "tags": ["ai", "chatbots", "customer service", "automation"],
+        "featured_image": "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d",
+        "reading_time": 7
+    },
+    {
+        "title": "Social Media Integration for Modern Websites",
+        "excerpt": "Best practices for integrating social media platforms into your web design projects.",
+        "content": "Social media integration is essential for modern websites. From sharing buttons to social login, learn how to create seamless connections between your website and major social platforms...",
+        "category": "Social Media",
+        "tags": ["social media", "integration", "sharing", "engagement"],
+        "featured_image": "https://images.unsplash.com/photo-1547658719-da2b51169166",
+        "reading_time": 5
+    }
+]
+
+async def initialize_blog_posts():
+    """Initialize sample blog posts if none exist"""
+    try:
+        existing_posts = await db.blog_posts.count_documents({})
+        if existing_posts == 0:
+            for post_data in SAMPLE_BLOG_POSTS:
+                slug = post_data["title"].lower().replace(" ", "-").replace(",", "").replace(".", "").replace(":", "")
+                slug = "".join(c for c in slug if c.isalnum() or c == "-")
+                
+                blog_post = BlogPost(
+                    **post_data,
+                    slug=slug
+                )
+                
+                post_dict = blog_post.dict()
+                post_dict['timestamp'] = post_dict['timestamp'].isoformat()
+                await db.blog_posts.insert_one(post_dict)
+            
+            logging.info("Sample blog posts initialized")
+    except Exception as e:
+        logging.error(f"Failed to initialize blog posts: {str(e)}")
+
 # Existing routes
 @api_router.get("/")
 async def root():
