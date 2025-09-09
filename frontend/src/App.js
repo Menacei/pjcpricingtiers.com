@@ -84,8 +84,18 @@ function App() {
       }
     };
 
+    const fetchSocialPosts = async () => {
+      try {
+        const response = await axios.get(`${API}/social/posts?limit=6`);
+        setSocialPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching social posts:", error);
+      }
+    };
+
     fetchBlogPosts();
     fetchSocialPlatforms();
+    fetchSocialPosts();
   }, []);
 
   // Check for payment return from Stripe
