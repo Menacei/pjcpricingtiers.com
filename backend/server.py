@@ -205,6 +205,213 @@ async def track_affiliate_click(link_id: str):
         logging.error(f"Click tracking error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to track click")
 
+# Stripe Payment Endpoints
+@api_router.post("/checkout/session")
+async def create_checkout_session(request: CheckoutRequest, http_request: Request):
+    try:
+        # Validate package exists
+        if request.package_id not in PACKAGES:
+            raise HTTPException(status_code=400, detail="Invalid package selected")
+        
+        # Get amount from server-side definition only (SECURITY)
+        amount = PACKAGES[request.package_id]
+        
+        # Initialize Stripe checkout
+        api_key = os.environ.get('STRIPE_API_KEY')
+        if not api_key:
+            raise HTTPException(status_code=500, detail="Stripe configuration error")
+        
+        host_url = str(http_request.base_url).rstrip('/')
+        webhook_url = f"{host_url}/api/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
+        
+        # Build URLs from provided origin (SECURITY: Dynamic URLs)
+        success_url = f"{request.origin_url}/success?session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{request.origin_url}/cancel"
+        
+        # Create checkout session
+        metadata = {
+            "package_id": request.package_id,
+            "source": "pjc_web_designs",
+            "customer_email": request.customer_email or ""
+        }
+        
+        checkout_request = CheckoutSessionRequest(
+            amount=amount,
+            currency="usd",
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata=metadata
+        )
+        
+        session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+        
+        # Create transaction record BEFORE redirect (MANDATORY)
+        transaction = PaymentTransaction(
+            package_id=request.package_id,
+            amount=amount,
+            currency="usd",
+            session_id=session.session_id,
+            payment_status="pending",
+            status="initiated",
+            metadata=metadata,
+            customer_email=request.customer_email
+        )
+        
+        transaction_dict = transaction.dict()
+        transaction_dict['timestamp'] = transaction_dict['timestamp'].isoformat()
+        await db.payment_transactions.insert_one(transaction_dict)
+        
+        return {
+            "url": session.url,
+            "session_id": session.session_id
+        }
+        
+    except Exception as e:
+        logging.error(f"Checkout session creation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create checkout session: {str(e)}")
+
+@api_router.get("/checkout/status/{session_id}")
+async def get_checkout_status(session_id: str):
+    try:
+        # Initialize Stripe checkout
+        api_key = os.environ.get('STRIPE_API_KEY')
+        if not api_key:
+            raise HTTPException(status_code=500, detail="Stripe configuration error")
+        
+        stripe_checkout = StripeCheckout(api_key=api_key, webhook_url="")
+        
+        # Get status from Stripe
+        checkout_status: CheckoutStatusResponse = await stripe_checkout.get_checkout_status(session_id)
+        
+        # Update database record if payment successful and not already processed
+        if checkout_status.payment_status == "paid":
+            # Check if already processed to prevent double processing
+            existing_transaction = await db.payment_transactions.find_one({
+                "session_id": session_id,
+                "payment_status": "paid"
+            })
+            
+            if not existing_transaction:
+                # Update transaction status
+                await db.payment_transactions.update_one(
+                    {"session_id": session_id},
+                    {
+                        "$set": {
+                            "payment_status": checkout_status.payment_status,
+                            "status": checkout_status.status,
+                            "updated_at": datetime.now(timezone.utc).isoformat()
+                        }
+                    }
+                )
+                logging.info(f"Payment successful for session {session_id}")
+        
+        return {
+            "status": checkout_status.status,
+            "payment_status": checkout_status.payment_status,
+            "amount_total": checkout_status.amount_total,
+            "currency": checkout_status.currency,
+            "metadata": checkout_status.metadata
+        }
+        
+    except Exception as e:
+        logging.error(f"Checkout status error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get checkout status: {str(e)}")
+
+@api_router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    try:
+        # Get the raw body and stripe signature
+        body = await request.body()
+        stripe_signature = request.headers.get("Stripe-Signature")
+        
+        if not stripe_signature:
+            raise HTTPException(status_code=400, detail="Missing Stripe signature")
+        
+        # Initialize Stripe checkout
+        api_key = os.environ.get('STRIPE_API_KEY')
+        if not api_key:
+            raise HTTPException(status_code=500, detail="Stripe configuration error")
+        
+        stripe_checkout = StripeCheckout(api_key=api_key, webhook_url="")
+        
+        # Handle webhook
+        webhook_response = await stripe_checkout.handle_webhook(body, stripe_signature)
+        
+        # Update transaction based on webhook event
+        if webhook_response.event_type in ["checkout.session.completed", "payment_intent.succeeded"]:
+            await db.payment_transactions.update_one(
+                {"session_id": webhook_response.session_id},
+                {
+                    "$set": {
+                        "payment_status": webhook_response.payment_status,
+                        "status": "completed",
+                        "webhook_processed": True,
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            logging.info(f"Webhook processed for session {webhook_response.session_id}")
+        
+        return {"status": "success"}
+        
+    except Exception as e:
+        logging.error(f"Webhook processing error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Webhook processing failed")
+
+@api_router.get("/packages")
+async def get_packages():
+    """Get available pricing packages"""
+    return {
+        "packages": [
+            {
+                "id": "essential",
+                "name": "Essential Web Presence",
+                "price": PACKAGES["essential"],
+                "features": [
+                    "5-page responsive website",
+                    "Mobile-optimized design",
+                    "Basic SEO setup",
+                    "Contact form integration",
+                    "Social media integration",
+                    "30 days support"
+                ]
+            },
+            {
+                "id": "professional",
+                "name": "Professional Business Suite",
+                "price": PACKAGES["professional"],
+                "features": [
+                    "Up to 15 custom pages",
+                    "Advanced animations & interactions",
+                    "E-commerce integration",
+                    "CMS for easy updates",
+                    "Advanced SEO & analytics",
+                    "90 days premium support",
+                    "Performance optimization",
+                    "Security features"
+                ],
+                "popular": True
+            },
+            {
+                "id": "enterprise",
+                "name": "Enterprise Digital Ecosystem",
+                "price": PACKAGES["enterprise"],
+                "features": [
+                    "Unlimited custom pages",
+                    "Custom web application",
+                    "API integrations",
+                    "Advanced user management",
+                    "Custom dashboard & analytics",
+                    "1 year premium support",
+                    "Dedicated project manager",
+                    "Training & documentation",
+                    "Regular maintenance & updates"
+                ]
+            }
+        ]
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
