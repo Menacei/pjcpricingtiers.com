@@ -1142,7 +1142,7 @@ function App() {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Footer */}
       <footer className="bg-slate-900 py-12">
