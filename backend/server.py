@@ -1267,6 +1267,18 @@ async def get_seo_meta():
         }
     }
 
+@api_router.get("/calculate-price/{package_id}")
+async def calculate_price_endpoint(package_id: str, pages: int = 0):
+    """Calculate price for a specific package and number of pages"""
+    try:
+        pricing = calculate_package_price(package_id, pages)
+        return pricing
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        logging.error(f"Price calculation error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to calculate price")
+
 @api_router.post("/analytics/page-view")
 async def track_page_view(page: str, referrer: Optional[str] = None):
     """Track page views for SEO analytics"""
