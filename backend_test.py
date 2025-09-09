@@ -406,6 +406,10 @@ class PJCBackendTester:
             url = f"{self.api_url}/sitemap.xml"
             response = requests.get(url, timeout=30)
             if response.status_code == 200:
+                self.tests_run += 1
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                
                 sitemap_content = response.text
                 
                 # Check for required XML sitemap elements
@@ -440,7 +444,8 @@ class PJCBackendTester:
                 
                 print("✅ XML Sitemap contains all required elements and pages")
             else:
-                print(f"❌ Sitemap request failed with status: {response.status_code}")
+                self.tests_run += 1
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
                 return False
                 
         except Exception as e:
