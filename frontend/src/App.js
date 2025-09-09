@@ -422,9 +422,9 @@ function App() {
   ];
 
   const affiliatePartners = [
-    { name: "TechStartup Inc", link: "https://example.com/partner1", clicks: 0 },
-    { name: "Digital Agency Pro", link: "https://example.com/partner2", clicks: 0 },
-    { name: "E-commerce Solutions", link: "https://example.com/partner3", clicks: 0 }
+    { name: "AOMEI - Data Protection", link: "https://www.jdoqocy.com/click-101532092-17143106", clicks: 0, description: "Professional backup & recovery solutions", category: "Software" },
+    { name: "Cool Frames", link: "https://www.dpbolvw.net/click-101532092-17140624", clicks: 0, description: "Designer prescription eyeglasses & frames", category: "Lifestyle" },
+    { name: "TechStartup Inc", link: "https://example.com/partner1", clicks: 0, description: "Startup development tools", category: "Development" }
   ];
 
   // Payment Status Display Component
