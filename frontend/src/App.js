@@ -618,6 +618,25 @@ function App() {
               </Button>
             </div>
             
+            {/* Quick Social Media Access */}
+            <div className="mt-8 text-center">
+              <p className="text-gray-400 text-sm mb-4">Follow PJC Web Designs:</p>
+              <div className="flex justify-center space-x-4">
+                {['facebook', 'instagram', 'twitter', 'linkedin'].map((platform) => (
+                  <Button
+                    key={platform}
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 rounded-full text-gray-400 hover:text-cyan-400 transition-colors"
+                    onClick={() => openSocialPlatform(platform)}
+                    title={`Follow us on ${platform.charAt(0).toUpperCase() + platform.slice(1)}`}
+                  >
+                    {getSocialIcon(platform)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            
             {/* Trust info */}
             <div className="mt-8 text-center">
               <p className="text-gray-500 text-sm">
