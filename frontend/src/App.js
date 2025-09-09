@@ -417,6 +417,87 @@ function App() {
     );
   };
 
+  // Payment Modal Component
+  const PaymentModal = () => {
+    if (!showPaymentModal || !selectedPackage) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <Card className="bg-slate-800 border-slate-700 w-full max-w-md">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-white">Choose Payment Method</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPaymentModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <CardDescription className="text-gray-300">
+              {selectedPackage.name} - {selectedPackage.price}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Stripe Payment Button */}
+            <Button
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+              onClick={() => processStripePayment(selectedPackage.id)}
+              disabled={paymentLoading === `stripe-${selectedPackage.id}`}
+            >
+              {paymentLoading === `stripe-${selectedPackage.id}` ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Pay with Stripe
+                </>
+              )}
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-600"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-slate-800 text-gray-400">or</span>
+              </div>
+            </div>
+
+            {/* PayPal Payment Component */}
+            <PayPalScriptProvider options={{ 
+              clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID || "demo",
+              currency: "USD"
+            }}>
+              <PayPalButtons
+                style={{
+                  layout: "vertical",
+                  color: "blue",
+                  shape: "rect",
+                  label: "paypal"
+                }}
+                createOrder={() => createPayPalOrder(selectedPackage.id)}
+                onApprove={(data) => capturePayPalOrder(data.orderID)}
+                onError={(err) => {
+                  console.error('PayPal error:', err);
+                  setPaymentStatus({
+                    type: 'error',
+                    message: 'PayPal payment failed. Please try again.'
+                  });
+                }}
+              />
+            </PayPalScriptProvider>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <PaymentStatusDisplay />
