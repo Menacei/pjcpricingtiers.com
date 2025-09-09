@@ -550,7 +550,7 @@ function App() {
       "@context": "https://schema.org",
       "@type": "WebPage",
       "name": "PJC Web Designs - Affordable Website Design for Startups",
-      "description": "Professional website design for startups and growing businesses starting at $199",
+      "description": "Professional website design for startups and growing businesses starting at $259",
       "url": window.location.href,
       "mainEntity": {
         "@type": "WebDesignCompany",
