@@ -627,6 +627,62 @@ function App() {
             </Card>
           ))}
         </div>
+        
+        {/* Strategic Tools Section */}
+        <div className="mt-16 p-6 bg-gradient-to-r from-slate-800/30 to-slate-700/30 rounded-2xl border border-slate-600">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold text-white mb-2">Power Your Projects</h3>
+            <p className="text-gray-400">Professional tools we use and recommend for web designers</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex items-center p-4 bg-slate-700/50 rounded-lg hover:bg-slate-700/70 transition-colors">
+              <Shield className="w-8 h-8 text-cyan-400 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-white font-semibold">Data Protection</h4>
+                <p className="text-gray-400 text-sm">Secure your creative work</p>
+              </div>
+              <a 
+                href="https://www.jdoqocy.com/click-101532092-17143106" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-cyan-400 hover:text-cyan-300 font-medium"
+              >
+                AOMEI →
+              </a>
+              <img src="https://www.tqlkg.com/image-101532092-17143106" width="1" height="1" style={{border: 0, position: 'absolute', left: '-9999px'}} alt="" />
+            </div>
+            
+            <div className="flex items-center p-4 bg-slate-700/50 rounded-lg hover:bg-slate-700/70 transition-colors">
+              <Users className="w-8 h-8 text-purple-400 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-white font-semibold">Designer Essentials</h4>
+                <p className="text-gray-400 text-sm">Professional eyewear for long work sessions</p>
+              </div>
+              <a 
+                href="https://www.dpbolvw.net/click-101532092-17140624" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-purple-400 hover:text-purple-300 font-medium"
+              >
+                Cool Frames →
+              </a>
+              <img src="https://www.ftjcfx.com/image-101532092-17140624" width="1" height="1" style={{border: 0, position: 'absolute', left: '-9999px'}} alt="" />
+            </div>
+          </div>
+          
+          {/* Large banner image affiliate */}
+          <div className="mt-6 text-center">
+            <a href="https://www.kqzyfj.com/click-101532092-17137571" target="_blank" rel="noopener noreferrer">
+              <img 
+                src="https://www.ftjcfx.com/image-101532092-17137571" 
+                alt="Professional Tools Banner" 
+                className="mx-auto rounded-lg opacity-80 hover:opacity-100 transition-opacity"
+                style={{maxWidth: '100%', height: 'auto', maxHeight: '200px'}}
+              />
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Social Media Content Section */}
