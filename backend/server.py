@@ -194,6 +194,44 @@ def get_paypal_client():
     environment = SandboxEnvironment(client_id=client_id, client_secret=client_secret)
     return environment.client()
 
+def calculate_package_price(package_id: str, total_pages: int) -> Dict:
+    """Calculate the final price based on package and number of pages"""
+    if package_id not in PACKAGES:
+        raise HTTPException(status_code=400, detail="Invalid package selected")
+    
+    package = PACKAGES[package_id]
+    base_price = package["base_price"]
+    included_pages = package["included_pages"]
+    additional_page_price = package["additional_page_price"]
+    max_pages = package["max_pages"]
+    
+    # Use included pages if total_pages is 0 or less than included
+    if total_pages <= 0:
+        total_pages = included_pages
+    
+    # Check if requested pages exceed maximum
+    if total_pages > max_pages:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Requested {total_pages} pages exceeds maximum of {max_pages} for this package"
+        )
+    
+    # Calculate additional pages and total price
+    additional_pages = max(0, total_pages - included_pages)
+    additional_cost = additional_pages * additional_page_price
+    final_price = base_price + additional_cost
+    
+    return {
+        "base_price": base_price,
+        "included_pages": included_pages,
+        "total_pages": total_pages,
+        "additional_pages": additional_pages,
+        "additional_page_price": additional_page_price,
+        "additional_cost": additional_cost,
+        "final_price": final_price,
+        "savings": f"Save ${additional_page_price - 75:.2f} per additional page vs highest tier" if package_id != "scale" else "Best value for additional pages"
+    }
+
 # Sample blog posts data
 SAMPLE_BLOG_POSTS = [
     {
