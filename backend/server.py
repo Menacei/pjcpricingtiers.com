@@ -546,6 +546,15 @@ async def get_blog_posts(limit: int = 10, category: Optional[str] = None):
         logging.error(f"Get blog posts error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get blog posts")
 
+@api_router.get("/blog/categories")
+async def get_blog_categories():
+    try:
+        categories = await db.blog_posts.distinct("category", {"published": True})
+        return {"categories": categories}
+    except Exception as e:
+        logging.error(f"Get blog categories error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get blog categories")
+
 @api_router.get("/blog/{slug}")
 async def get_blog_post(slug: str):
     try:
@@ -583,15 +592,6 @@ async def create_blog_post(post_data: BlogPostCreate):
     except Exception as e:
         logging.error(f"Create blog post error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create blog post")
-
-@api_router.get("/blog/categories")
-async def get_blog_categories():
-    try:
-        categories = await db.blog_posts.distinct("category", {"published": True})
-        return {"categories": categories}
-    except Exception as e:
-        logging.error(f"Get blog categories error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to get blog categories")
 
 # Social media endpoints
 @api_router.post("/social/share")
