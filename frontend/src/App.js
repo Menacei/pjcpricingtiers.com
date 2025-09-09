@@ -1099,10 +1099,11 @@ function App() {
             </CardContent>
           </Card>
         </div>
-      </div>
+        </section>
+      </main>
 
       {/* Social Media Integration Section */}
-      <div className="bg-slate-800/50 py-16">
+      <section className="bg-slate-800/50 py-16" id="connect">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">
