@@ -217,6 +217,79 @@ SAMPLE_BLOG_POSTS = [
     }
 ]
 
+# Sample social media posts data
+SAMPLE_SOCIAL_POSTS = [
+    {
+        "platform": "instagram",
+        "content": "Just launched this stunning e-commerce site for a local boutique! 🛍️ Urban tech meets fashion in the most beautiful way. #WebDesign #UrbanTech #Ecommerce",
+        "media_url": "https://images.unsplash.com/photo-1559028012-481c04fa702d",
+        "media_type": "image",
+        "author_name": "PJC Web Designs",
+        "likes": 247,
+        "comments": 18,
+        "shares": 32,
+        "hashtags": ["webdesign", "urbantech", "ecommerce", "boutique"],
+        "featured": True
+    },
+    {
+        "platform": "twitter",
+        "content": "🚀 Breaking: Our AI chatbot integration just helped another client increase customer engagement by 150%! The future of web design is here. #AI #WebDevelopment #ChatBot",
+        "media_url": "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d",
+        "media_type": "image",
+        "author_name": "PJC Web Designs",
+        "likes": 89,
+        "comments": 12,
+        "shares": 45,
+        "hashtags": ["ai", "webdevelopment", "chatbot", "engagement"],
+        "featured": True
+    },
+    {
+        "platform": "linkedin",
+        "content": "Client success story: We helped a startup scale from 0 to 10k users with our Professional Business Suite. Custom web applications that grow with your business. 📈",
+        "media_url": "https://images.unsplash.com/photo-1547658719-da2b51169166",
+        "media_type": "image",
+        "author_name": "PJC Web Designs",
+        "likes": 156,
+        "comments": 23,
+        "shares": 67,
+        "hashtags": ["startup", "scaling", "webapplication", "success"],
+        "featured": True
+    },
+    {
+        "platform": "facebook",
+        "content": "Behind the scenes: Our team working on the latest urban tech design project. When creativity meets technology, magic happens! ✨ #BehindTheScenes #TeamWork",
+        "media_url": "https://images.unsplash.com/photo-1707226845968-c7e5e3409e35",
+        "media_type": "image",
+        "author_name": "PJC Web Designs",
+        "likes": 134,
+        "comments": 28,
+        "shares": 19,
+        "hashtags": ["behindthescenes", "teamwork", "urbantech", "creativity"]
+    },
+    {
+        "platform": "instagram",
+        "content": "Color theory in action! 🎨 This gradient combination perfectly captures the urban tech aesthetic our clients love. What's your favorite color scheme?",
+        "media_url": "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d",
+        "media_type": "image",
+        "author_name": "PJC Web Designs",
+        "likes": 203,
+        "comments": 34,
+        "shares": 28,
+        "hashtags": ["colortheory", "gradient", "design", "urbantech"]
+    },
+    {
+        "platform": "twitter",
+        "content": "💡 Pro tip: Mobile-first design isn't just a trend, it's essential. 70% of web traffic comes from mobile devices. Is your site ready? #MobileFirst #WebDesign",
+        "media_url": "https://images.unsplash.com/photo-1559028012-481c04fa702d",
+        "media_type": "image",
+        "author_name": "PJC Web Designs",
+        "likes": 78,
+        "comments": 15,
+        "shares": 52,
+        "hashtags": ["mobilefirst", "webdesign", "protip", "responsive"]
+    }
+]
+
 async def initialize_blog_posts():
     """Initialize sample blog posts if none exist"""
     try:
