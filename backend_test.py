@@ -237,6 +237,105 @@ class PJCBackendTester:
         print("✅ Social stats endpoint working")
         return True
 
+    def test_social_media_content_endpoints(self):
+        """Test social media content endpoints for the new social impact section"""
+        print("\n📱 Testing Social Media Content Endpoints...")
+        
+        # Test getting social media posts (limit 6 for homepage)
+        success, response = self.run_test("Get Social Media Posts", "GET", "social/posts?limit=6", 200)
+        if not success:
+            return False
+            
+        if not isinstance(response, list):
+            print("❌ Social posts response should be a list")
+            return False
+            
+        if len(response) != 6:
+            print(f"❌ Expected 6 social posts, got {len(response)}")
+            return False
+            
+        # Verify social post structure
+        first_post = response[0]
+        required_fields = ['id', 'platform', 'content', 'media_url', 'media_type', 'author_name', 
+                          'likes', 'comments', 'shares', 'hashtags', 'featured', 'timestamp']
+        
+        for field in required_fields:
+            if field not in first_post:
+                print(f"❌ Social post missing required field: {field}")
+                return False
+                
+        # Verify platform values are correct
+        expected_platforms = ['instagram', 'twitter', 'linkedin', 'facebook']
+        post_platforms = [post['platform'] for post in response]
+        
+        for platform in expected_platforms:
+            if platform not in post_platforms:
+                print(f"❌ Missing expected platform in posts: {platform}")
+                return False
+                
+        # Check for featured posts
+        featured_posts = [post for post in response if post['featured']]
+        if len(featured_posts) < 3:
+            print(f"❌ Expected at least 3 featured posts, got {len(featured_posts)}")
+            return False
+            
+        print(f"✅ Found {len(response)} social posts with correct structure")
+        print(f"✅ Found {len(featured_posts)} featured posts")
+        
+        # Test getting featured social posts specifically
+        success, response = self.run_test("Get Featured Social Posts", "GET", "social/featured", 200)
+        if not success:
+            return False
+            
+        if not isinstance(response, list):
+            print("❌ Featured social posts response should be a list")
+            return False
+            
+        # All returned posts should be featured
+        for post in response:
+            if not post.get('featured', False):
+                print("❌ Non-featured post returned from featured endpoint")
+                return False
+                
+        print(f"✅ Featured social posts endpoint working ({len(response)} posts)")
+        
+        # Test individual social post retrieval
+        if response:
+            test_post_id = response[0]['id']
+            success, post_response = self.run_test("Get Individual Social Post", "GET", f"social/posts/{test_post_id}", 200)
+            if not success:
+                return False
+                
+            if post_response.get('id') != test_post_id:
+                print(f"❌ Expected post ID '{test_post_id}', got '{post_response.get('id')}'")
+                return False
+                
+            print("✅ Individual social post retrieval working")
+            
+            # Test engagement tracking
+            engagement_actions = ['like', 'comment', 'share']
+            for action in engagement_actions:
+                success, engage_response = self.run_test(
+                    f"Track {action.title()} Engagement", 
+                    "POST", 
+                    f"social/posts/{test_post_id}/engage?action={action}", 
+                    200
+                )
+                if not success:
+                    return False
+                    
+                if 'message' not in engage_response or 'action' not in engage_response:
+                    print(f"❌ Engagement response missing required fields for {action}")
+                    return False
+                    
+                if engage_response['action'] != action:
+                    print(f"❌ Expected action '{action}', got '{engage_response['action']}'")
+                    return False
+                    
+            print("✅ All engagement tracking (like, comment, share) working")
+        
+        return True
+
     def test_paypal_endpoints(self):
         """Test PayPal payment endpoints"""
         print("\n💳 Testing PayPal Payment Endpoints...")
