@@ -348,8 +348,22 @@ function App() {
                     </li>
                   ))}
                 </ul>
-                <Button className={`w-full bg-gradient-to-r ${service.color} hover:opacity-90 text-white`}>
-                  Get Started
+                <Button 
+                  className={`w-full bg-gradient-to-r ${service.color} hover:opacity-90 text-white`}
+                  onClick={() => initiatePayment(service.id)}
+                  disabled={paymentLoading === service.id}
+                >
+                  {paymentLoading === service.id ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Purchase Now
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
