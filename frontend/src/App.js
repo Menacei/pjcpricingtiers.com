@@ -159,9 +159,16 @@ function App() {
     pollPaymentStatus(sessionId);
   };
 
-  // Function to initiate payment
+  // Function to initiate payment (opens payment modal)
   const initiatePayment = async (packageId) => {
-    setPaymentLoading(packageId);
+    const selectedService = services.find(service => service.id === packageId);
+    setSelectedPackage(selectedService);
+    setShowPaymentModal(true);
+  };
+
+  // Function to process Stripe payment
+  const processStripePayment = async (packageId) => {
+    setPaymentLoading(`stripe-${packageId}`);
     
     try {
       const originUrl = window.location.origin;
@@ -169,7 +176,8 @@ function App() {
       const requestBody = {
         package_id: packageId,
         origin_url: originUrl,
-        customer_email: contactForm.email || null
+        customer_email: contactForm.email || null,
+        payment_method: "stripe"
       };
 
       const response = await axios.post(`${API}/checkout/session`, requestBody);
@@ -180,9 +188,52 @@ function App() {
         throw new Error('No checkout URL received');
       }
     } catch (error) {
-      console.error('Payment error:', error);
-      alert('Failed to initiate payment. Please try again.');
+      console.error('Stripe payment error:', error);
+      alert('Failed to initiate Stripe payment. Please try again.');
       setPaymentLoading("");
+    }
+  };
+
+  // Function to create PayPal order
+  const createPayPalOrder = async (packageId) => {
+    try {
+      const originUrl = window.location.origin;
+      
+      const requestBody = {
+        package_id: packageId,
+        origin_url: originUrl,
+        customer_email: contactForm.email || null
+      };
+
+      const response = await axios.post(`${API}/paypal/orders`, requestBody);
+      return response.data.order_id;
+    } catch (error) {
+      console.error('PayPal order creation error:', error);
+      throw error;
+    }
+  };
+
+  // Function to capture PayPal payment
+  const capturePayPalOrder = async (orderId) => {
+    try {
+      const response = await axios.post(`${API}/paypal/orders/${orderId}/capture`);
+      
+      if (response.data.status === "COMPLETED") {
+        setPaymentStatus({
+          type: 'success',
+          message: 'PayPal payment successful! Thank you for your purchase. We will contact you soon to start your project.'
+        });
+        setShowPaymentModal(false);
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('PayPal capture error:', error);
+      setPaymentStatus({
+        type: 'error',
+        message: 'PayPal payment failed. Please try again.'
+      });
+      throw error;
     }
   };
 
