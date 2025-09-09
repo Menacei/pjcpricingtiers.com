@@ -600,48 +600,48 @@ async def get_packages():
     return {
         "packages": [
             {
-                "id": "essential",
-                "name": "Essential Web Presence",
-                "price": PACKAGES["essential"],
+                "id": "starter",
+                "name": "Startup Launch",
+                "price": PACKAGES["starter"],
                 "features": [
-                    "5-page responsive website",
-                    "Mobile-optimized design",
-                    "Basic SEO setup",
-                    "Contact form integration",
-                    "Social media integration",
-                    "30 days support"
+                    "3-page modern website",
+                    "Mobile-responsive design",
+                    "Basic SEO optimization",
+                    "Contact form & social links",
+                    "Free domain setup help",
+                    "30 days support",
+                    "Perfect for new businesses"
                 ]
             },
             {
-                "id": "professional",
-                "name": "Professional Business Suite",
-                "price": PACKAGES["professional"],
+                "id": "growth",
+                "name": "Business Growth",
+                "price": PACKAGES["growth"],
                 "features": [
-                    "Up to 15 custom pages",
-                    "Advanced animations & interactions",
-                    "E-commerce integration",
-                    "CMS for easy updates",
-                    "Advanced SEO & analytics",
-                    "90 days premium support",
-                    "Performance optimization",
-                    "Security features"
+                    "Up to 8 custom pages",
+                    "Modern animations",
+                    "Blog integration",
+                    "Advanced SEO setup",
+                    "Social media integration",
+                    "Email marketing setup",
+                    "60 days support",
+                    "Analytics dashboard"
                 ],
                 "popular": True
             },
             {
-                "id": "enterprise",
-                "name": "Enterprise Digital Ecosystem",
-                "price": PACKAGES["enterprise"],
+                "id": "scale",
+                "name": "Scale & Expand",
+                "price": PACKAGES["scale"],
                 "features": [
-                    "Unlimited custom pages",
-                    "Custom web application",
-                    "API integrations",
-                    "Advanced user management",
-                    "Custom dashboard & analytics",
-                    "1 year premium support",
-                    "Dedicated project manager",
-                    "Training & documentation",
-                    "Regular maintenance & updates"
+                    "Up to 15 pages",
+                    "E-commerce functionality",
+                    "CMS for easy updates",
+                    "Advanced integrations",
+                    "Performance optimization",
+                    "Security features",
+                    "90 days premium support",
+                    "Monthly growth consultation"
                 ]
             }
         ]
