@@ -1089,6 +1089,112 @@ async def get_featured_social_posts():
         logging.error(f"Get featured social posts error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get featured social posts")
 
+# SEO Endpoints
+@api_router.get("/sitemap.xml")
+async def get_sitemap():
+    """Generate XML sitemap for SEO"""
+    from fastapi.responses import Response
+    
+    base_url = "https://pjcwebdesigns.solutions"
+    
+    # Get blog posts for sitemap
+    try:
+        blog_posts = await db.blog_posts.find({"published": True}).to_list(1000)
+    except:
+        blog_posts = []
+    
+    sitemap_xml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{base_url}</loc>
+        <lastmod>2025-09-09</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>{base_url}/#pricing</loc>
+        <lastmod>2025-09-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>{base_url}/#portfolio</loc>
+        <lastmod>2025-09-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{base_url}/#blog</loc>
+        <lastmod>2025-09-09</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{base_url}/#contact</loc>
+        <lastmod>2025-09-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>'''
+    
+    # Add blog posts to sitemap
+    for post in blog_posts:
+        sitemap_xml += f'''
+    <url>
+        <loc>{base_url}/blog/{post.get('slug', post.get('id'))}</loc>
+        <lastmod>{post.get('timestamp', '2025-09-09')[:10]}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>'''
+    
+    sitemap_xml += '''
+</urlset>'''
+    
+    return Response(content=sitemap_xml, media_type="application/xml")
+
+@api_router.get("/robots.txt")
+async def get_robots():
+    """Generate robots.txt for SEO"""
+    from fastapi.responses import Response
+    
+    robots_txt = """User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://pjcwebdesigns.solutions/api/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Disallow certain paths
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+Disallow: /*?*
+
+# Allow important pages
+Allow: /api/sitemap.xml
+Allow: /api/robots.txt
+"""
+    
+    return Response(content=robots_txt, media_type="text/plain")
+
+@api_router.get("/seo/meta")
+async def get_seo_meta():
+    """Get SEO metadata for dynamic pages"""
+    return {
+        "title": "PJC Web Designs - Affordable Website Design for Startups",
+        "description": "Professional website design for startups and growing businesses. Modern, mobile-responsive websites starting at just $199.",
+        "keywords": "web design, startup websites, affordable web design, mobile responsive design, SEO optimization, small business websites",
+        "canonical": "https://pjcwebdesigns.solutions",
+        "og_image": "https://images.unsplash.com/photo-1707226845968-c7e5e3409e35",
+        "structured_data": {
+            "@context": "https://schema.org",
+            "@type": "WebDesignCompany",
+            "name": "PJC Web Designs",
+            "priceRange": "$199-$999"
+        }
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
