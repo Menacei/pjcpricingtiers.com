@@ -1095,6 +1095,45 @@ function App() {
                 <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Contact</Button></li>
               </ul>
             </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Recommended Tools</h4>
+              <ul className="space-y-2">
+                <li>
+                  <a 
+                    href="https://www.jdoqocy.com/click-101532092-17143106" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-cyan-400 text-sm transition-colors"
+                  >
+                    AOMEI - Data Backup
+                  </a>
+                  <img src="https://www.tqlkg.com/image-101532092-17143106" width="1" height="1" style={{border: 0, display: 'none'}} alt="" />
+                </li>
+                <li>
+                  <a 
+                    href="https://www.dpbolvw.net/click-101532092-17140624" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-cyan-400 text-sm transition-colors"
+                  >
+                    Cool Frames - Designer Eyewear
+                  </a>
+                  <img src="https://www.ftjcfx.com/image-101532092-17140624" width="1" height="1" style={{border: 0, display: 'none'}} alt="" />
+                </li>
+                <li>
+                  <a 
+                    href="https://www.kqzyfj.com/click-101532092-17146866" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-cyan-400 text-sm transition-colors"
+                  >
+                    Professional Resources
+                  </a>
+                  <img src="https://www.tqlkg.com/image-101532092-17146866" width="1" height="1" style={{border: 0, display: 'none'}} alt="" />
+                </li>
+              </ul>
+            </div>
           </div>
           
           <div className="border-t border-slate-800 pt-8">
