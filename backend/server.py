@@ -86,6 +86,13 @@ class CheckoutRequest(BaseModel):
 class PaymentStatusRequest(BaseModel):
     session_id: str
 
+# Fixed pricing packages (SECURITY: Never allow frontend to set prices)
+PACKAGES = {
+    "essential": 599.99,
+    "professional": 2999.99,
+    "enterprise": 10000.0
+}
+
 # Existing routes
 @api_router.get("/")
 async def root():
