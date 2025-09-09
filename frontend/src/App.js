@@ -629,6 +629,140 @@ function App() {
         </div>
       </div>
 
+      {/* Social Media Content Section */}
+      <div className="bg-slate-800/30 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Our Social Impact
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              See what we're sharing, building, and celebrating with our community across social platforms.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {socialPosts.map((post, index) => (
+              <Card key={index} className="bg-slate-700/50 border-slate-600 hover:border-cyan-400 transition-all duration-300 group overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Platform Header */}
+                  <div className={`${getPlatformStyling(post.platform)} p-4 flex items-center space-x-3`}>
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      {getSocialIcon(post.platform)}
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold">{post.author_name}</h3>
+                      <p className="text-white/80 text-sm capitalize">{post.platform}</p>
+                    </div>
+                    {post.featured && (
+                      <Badge className="ml-auto bg-yellow-500 text-black">
+                        <Star className="w-3 h-3 mr-1" />
+                        Featured
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Media Content */}
+                  {post.media_url && (
+                    <div className="relative overflow-hidden">
+                      <img 
+                        src={post.media_url} 
+                        alt="Social media post"
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  )}
+
+                  {/* Post Content */}
+                  <div className="p-4">
+                    <p className="text-gray-300 mb-4 leading-relaxed">
+                      {post.content}
+                    </p>
+
+                    {/* Hashtags */}
+                    {post.hashtags && post.hashtags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {post.hashtags.slice(0, 3).map((tag, idx) => (
+                          <Badge key={idx} variant="secondary" className="bg-cyan-600/20 text-cyan-400 border-cyan-600/30">
+                            #{tag}
+                          </Badge>
+                        ))}
+                        {post.hashtags.length > 3 && (
+                          <Badge variant="secondary" className="bg-slate-600 text-gray-300">
+                            +{post.hashtags.length - 3} more
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Engagement Stats */}
+                    <div className="flex items-center justify-between text-gray-400 text-sm">
+                      <div className="flex items-center space-x-4">
+                        <button 
+                          onClick={() => handlePostEngagement(post.id, 'like')}
+                          className="flex items-center space-x-1 hover:text-red-400 transition-colors"
+                        >
+                          <Star className="w-4 h-4" />
+                          <span>{post.likes}</span>
+                        </button>
+                        <button 
+                          onClick={() => handlePostEngagement(post.id, 'comment')}
+                          className="flex items-center space-x-1 hover:text-blue-400 transition-colors"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          <span>{post.comments}</span>
+                        </button>
+                        <button 
+                          onClick={() => handlePostEngagement(post.id, 'share')}
+                          className="flex items-center space-x-1 hover:text-green-400 transition-colors"
+                        >
+                          <Share2 className="w-4 h-4" />
+                          <span>{post.shares}</span>
+                        </button>
+                      </div>
+                      <div className="text-xs">
+                        {new Date(post.timestamp).toLocaleDateString()}
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-4 pt-4 border-t border-slate-600">
+                      <div className="flex items-center justify-between">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-gray-400 hover:text-cyan-400"
+                          onClick={() => window.open(post.post_url, '_blank')}
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          View Original
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-gray-400 hover:text-cyan-400"
+                          onClick={() => handleSocialShare(post.platform, post.id)}
+                        >
+                          <Share2 className="w-4 h-4 mr-2" />
+                          Share
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Button variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900">
+              Follow Us on All Platforms
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Portfolio Section */}
       <div className="bg-slate-800/30 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
