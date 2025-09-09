@@ -794,139 +794,201 @@ function App() {
         </div>
         </section>
 
-        {/* Social Media Content Section */}
-        <section className="bg-slate-800/30 py-20" id="social">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Our Social Impact
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              See what we're sharing, building, and celebrating with our community across social platforms.
-            </p>
-          </div>
+        {/* Landing Page Examples Section */}
+        <section className="bg-slate-800/30 py-20" id="examples">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                Landing Page Examples by Tier
+              </h2>
+              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+                See exactly what you'll get with each package. Real landing page examples showcasing different business themes and complexity levels.
+              </p>
+            </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {socialPosts.map((post, index) => (
-              <Card key={index} className="bg-slate-700/50 border-slate-600 hover:border-cyan-400 transition-all duration-300 group overflow-hidden">
-                <CardContent className="p-0">
-                  {/* Platform Header */}
-                  <div className={`${getPlatformStyling(post.platform)} p-4 flex items-center space-x-3`}>
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      {getSocialIcon(post.platform)}
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold">{post.author_name}</h3>
-                      <p className="text-white/80 text-sm capitalize">{post.platform}</p>
-                    </div>
-                    {post.featured && (
-                      <Badge className="ml-auto bg-yellow-500 text-black">
-                        <Star className="w-3 h-3 mr-1" />
-                        Featured
-                      </Badge>
-                    )}
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Startup Launch Example */}
+              <Card className="bg-slate-700/50 border-slate-600 hover:border-green-400 transition-all duration-300 group overflow-hidden">
+                <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-4 text-center">
+                  <Rocket className="w-8 h-8 mx-auto text-white mb-2" />
+                  <h3 className="text-xl font-bold text-white">Startup Launch - $325</h3>
+                  <p className="text-green-100 text-sm">3-Page Coffee Shop Landing</p>
+                </div>
+                
+                <div className="relative overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb" 
+                    alt="Coffee shop landing page example - clean, minimal design with hero section, menu preview, and contact"
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h4 className="text-white font-semibold mb-1">Brew Haven Coffee</h4>
+                    <p className="text-gray-300 text-xs">Clean, minimal design perfect for local businesses</p>
                   </div>
+                </div>
 
-                  {/* Media Content */}
-                  {post.media_url && (
-                    <div className="relative overflow-hidden">
-                      <img 
-                        src={post.media_url} 
-                        alt={`PJC Web Designs ${post.platform} post: ${post.content.substring(0, 80)}...`}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                      />
+                <CardContent className="p-6">
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
+                      Hero section with compelling headline
                     </div>
-                  )}
-
-                  {/* Post Content */}
-                  <div className="p-4">
-                    <p className="text-gray-300 mb-4 leading-relaxed">
-                      {post.content}
-                    </p>
-
-                    {/* Hashtags */}
-                    {post.hashtags && post.hashtags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {post.hashtags.slice(0, 3).map((tag, idx) => (
-                          <Badge key={idx} variant="secondary" className="bg-cyan-600/20 text-cyan-400 border-cyan-600/30">
-                            #{tag}
-                          </Badge>
-                        ))}
-                        {post.hashtags.length > 3 && (
-                          <Badge variant="secondary" className="bg-slate-600 text-gray-300">
-                            +{post.hashtags.length - 3} more
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Engagement Stats */}
-                    <div className="flex items-center justify-between text-gray-400 text-sm">
-                      <div className="flex items-center space-x-4">
-                        <button 
-                          onClick={() => handlePostEngagement(post.id, 'like')}
-                          className="flex items-center space-x-1 hover:text-red-400 transition-colors"
-                        >
-                          <Star className="w-4 h-4" />
-                          <span>{post.likes}</span>
-                        </button>
-                        <button 
-                          onClick={() => handlePostEngagement(post.id, 'comment')}
-                          className="flex items-center space-x-1 hover:text-blue-400 transition-colors"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          <span>{post.comments}</span>
-                        </button>
-                        <button 
-                          onClick={() => handlePostEngagement(post.id, 'share')}
-                          className="flex items-center space-x-1 hover:text-green-400 transition-colors"
-                        >
-                          <Share2 className="w-4 h-4" />
-                          <span>{post.shares}</span>
-                        </button>
-                      </div>
-                      <div className="text-xs">
-                        {new Date(post.timestamp).toLocaleDateString()}
-                      </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
+                      About page with story & values
                     </div>
-
-                    {/* Action Buttons */}
-                    <div className="mt-4 pt-4 border-t border-slate-600">
-                      <div className="flex items-center justify-between">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="text-gray-400 hover:text-cyan-400"
-                          onClick={() => window.open(post.post_url, '_blank')}
-                        >
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          View Original
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-gray-400 hover:text-cyan-400"
-                          onClick={() => handleSocialShare(post.platform, post.id)}
-                        >
-                          <Share2 className="w-4 h-4 mr-2" />
-                          Share
-                        </Button>
-                      </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
+                      Contact page with map & hours
                     </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
+                      Mobile-responsive design
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
+                      Contact form integration
+                    </div>
+                  </div>
+                  
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                    <p className="text-green-400 text-xs font-medium">Perfect for: Local businesses, cafes, consultants, service providers</p>
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
 
-          <div className="text-center mt-12">
-            <Button variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900">
-              Follow Us on All Platforms
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
+              {/* Business Growth Example */}
+              <Card className="bg-slate-700/50 border-slate-600 hover:border-cyan-400 transition-all duration-300 group overflow-hidden ring-2 ring-cyan-400/50">
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-4 text-center relative">
+                  <Badge className="absolute top-2 right-2 bg-yellow-500 text-black text-xs">
+                    Most Popular
+                  </Badge>
+                  <Globe className="w-8 h-8 mx-auto text-white mb-2" />
+                  <h3 className="text-xl font-bold text-white">Business Growth - $812</h3>
+                  <p className="text-cyan-100 text-sm">8-Page SaaS Product Landing</p>
+                </div>
+                
+                <div className="relative overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f" 
+                    alt="SaaS product landing page example - modern design with features, pricing, testimonials, and blog"
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h4 className="text-white font-semibold mb-1">TaskFlow Pro</h4>
+                    <p className="text-gray-300 text-xs">Feature-rich SaaS landing with advanced animations</p>
+                  </div>
+                </div>
+
+                <CardContent className="p-6">
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
+                      Advanced hero with product demo
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
+                      Features page with animations
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
+                      Pricing page with tiers
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
+                      Testimonials & case studies
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
+                      Blog integration with CMS
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
+                      Analytics dashboard setup
+                    </div>
+                  </div>
+                  
+                  <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-3">
+                    <p className="text-cyan-400 text-xs font-medium">Perfect for: SaaS products, tech startups, digital agencies, online services</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Scale & Expand Example */}
+              <Card className="bg-slate-700/50 border-slate-600 hover:border-purple-400 transition-all duration-300 group overflow-hidden">
+                <div className="bg-gradient-to-r from-purple-400 to-pink-500 p-4 text-center">
+                  <Shield className="w-8 h-8 mx-auto text-white mb-2" />
+                  <h3 className="text-xl font-bold text-white">Scale & Expand - $1,625</h3>
+                  <p className="text-purple-100 text-sm">15-Page E-commerce Platform</p>
+                </div>
+                
+                <div className="relative overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d" 
+                    alt="E-commerce platform landing page example - sophisticated design with product catalogs, user accounts, and payment integration"
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h4 className="text-white font-semibold mb-1">UrbanStyle Marketplace</h4>
+                    <p className="text-gray-300 text-xs">Full-featured e-commerce with custom functionality</p>
+                  </div>
+                </div>
+
+                <CardContent className="p-6">
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
+                      Advanced product catalog system
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
+                      User accounts & profiles
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
+                      Shopping cart & checkout
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
+                      Payment gateway integration
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
+                      Admin dashboard & CMS
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
+                      Advanced SEO & performance
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
+                      Custom integrations & APIs
+                    </div>
+                  </div>
+                  
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+                    <p className="text-purple-400 text-xs font-medium">Perfect for: E-commerce stores, marketplaces, large businesses, complex web apps</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="text-center mt-12">
+              <Button 
+                className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900"
+                onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })}
+              >
+                Choose Your Package
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </div>
           </div>
-        </div>
         </section>
 
         {/* Portfolio Section */}
