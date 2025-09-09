@@ -993,20 +993,11 @@ function App() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-6">
-              Let's Create Something Amazing
+              Let's Launch Your Business Online
             </h2>
-            <p className="text-xl text-gray-400 mb-4">
-              Ready to transform your digital presence? Get in touch and let's discuss your project.
+            <p className="text-xl text-gray-400">
+              Ready to establish your online presence? Let's discuss your startup's digital needs and growth goals.
             </p>
-            <div className="flex items-center justify-center space-x-2 text-lg">
-              <span className="text-gray-300">Contact us directly:</span>
-              <a 
-                href="mailto:Patrickjchurch04@gmail.com" 
-                className="text-cyan-400 hover:text-cyan-300 transition-colors font-semibold underline"
-              >
-                Patrickjchurch04@gmail.com
-              </a>
-            </div>
           </div>
 
           <Card className="bg-slate-800/50 border-slate-700">
