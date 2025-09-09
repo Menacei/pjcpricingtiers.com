@@ -578,8 +578,9 @@ function App() {
           <div className="rounded-2xl overflow-hidden shadow-2xl">
             <img 
               src="https://images.unsplash.com/photo-1707226845968-c7e5e3409e35" 
-              alt="Urban Tech Architecture"
+              alt="Modern urban tech architecture representing innovative web design solutions for startups"
               className="w-full h-96 object-cover"
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
           </div>
