@@ -317,6 +317,35 @@ function App() {
     }
   };
 
+  // Function to handle post engagement
+  const handlePostEngagement = async (postId, action) => {
+    try {
+      await axios.post(`${API}/social/posts/${postId}/engage?action=${action}`);
+      // Update the local state to reflect the engagement
+      setSocialPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id === postId 
+            ? { ...post, [`${action}s`]: post[`${action}s`] + 1 }
+            : post
+        )
+      );
+    } catch (error) {
+      console.error("Error tracking engagement:", error);
+    }
+  };
+
+  // Function to get platform-specific styling
+  const getPlatformStyling = (platform) => {
+    const styles = {
+      instagram: "bg-gradient-to-r from-purple-500 to-pink-500",
+      twitter: "bg-blue-500",
+      linkedin: "bg-blue-600",
+      facebook: "bg-blue-700",
+      default: "bg-slate-600"
+    };
+    return styles[platform] || styles.default;
+  };
+
   const services = [
     {
       id: "essential",
