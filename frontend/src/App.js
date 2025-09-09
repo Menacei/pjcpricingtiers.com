@@ -582,7 +582,15 @@ function App() {
       "mainEntity": {
         "@type": "WebDesignCompany",
         "name": "PJC Web Designs",
-        "priceRange": "$199-$999"
+        "priceRange": "$199-$999",
+        "sameAs": [
+          "https://www.facebook.com/pjcwebdesigns",
+          "https://www.twitter.com/pjcwebdesigns",
+          "https://www.linkedin.com/company/pjcwebdesigns", 
+          "https://www.instagram.com/pjcwebdesigns",
+          "https://www.pinterest.com/pjcwebdesigns",
+          "https://www.reddit.com/user/pjcwebdesigns"
+        ]
       }
     });
     document.head.appendChild(script);
