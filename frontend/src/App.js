@@ -229,6 +229,29 @@ function App() {
     }
   };
 
+  // Social sharing function
+  const handleSocialShare = async (platform, postId) => {
+    try {
+      const response = await axios.post(`${API}/social/share?post_id=${postId}&platform=${platform}`);
+      if (response.data.share_url) {
+        window.open(response.data.share_url, '_blank', 'width=600,height=400');
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
+
+  // Social platform icons
+  const getSocialIcon = (platform) => {
+    switch (platform) {
+      case 'facebook': return <Facebook className="w-4 h-4" />;
+      case 'twitter': return <Twitter className="w-4 h-4" />;
+      case 'linkedin': return <Linkedin className="w-4 h-4" />;
+      case 'instagram': return <Instagram className="w-4 h-4" />;
+      default: return <Share2 className="w-4 h-4" />;
+    }
+  };
+
   const services = [
     {
       id: "essential",
