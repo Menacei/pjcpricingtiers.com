@@ -408,6 +408,7 @@ def main():
         ("Status Checks", tester.test_status_endpoints),
         ("Blog APIs", tester.test_blog_endpoints),
         ("Social Media APIs", tester.test_social_media_endpoints),
+        ("Social Media Content APIs", tester.test_social_media_content_endpoints),
         ("PayPal APIs", tester.test_paypal_endpoints),
         ("Packages API", tester.test_packages_endpoint)
     ]
