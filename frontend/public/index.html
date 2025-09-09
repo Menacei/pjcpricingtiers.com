@@ -97,10 +97,17 @@
         }
         </script>
         
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        
         <!-- Preconnect to external domains for performance -->
         <link rel="preconnect" href="https://images.unsplash.com">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        
+        <!-- DNS Prefetch for performance -->
+        <link rel="dns-prefetch" href="//images.unsplash.com">
+        <link rel="dns-prefetch" href="//fonts.googleapis.com">
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
