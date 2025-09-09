@@ -549,7 +549,8 @@ def main():
         ("Social Media APIs", tester.test_social_media_endpoints),
         ("Social Media Content APIs", tester.test_social_media_content_endpoints),
         ("PayPal APIs", tester.test_paypal_endpoints),
-        ("Packages API", tester.test_packages_endpoint)
+        ("Packages API", tester.test_packages_endpoint),
+        ("SEO APIs", tester.test_seo_endpoints)
     ]
     
     failed_tests = []
