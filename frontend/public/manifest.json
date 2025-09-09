@@ -1,0 +1,33 @@
+{
+  "short_name": "PJC Web Designs",
+  "name": "PJC Web Designs - Affordable Website Design for Startups",
+  "description": "Professional website design for startups and growing businesses starting at $199",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1707226845968-c7e5e3409e35?w=192&h=192&fit=crop&crop=center",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1707226845968-c7e5e3409e35?w=512&h=512&fit=crop&crop=center",
+      "sizes": "512x512", 
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#06b6d4",
+  "background_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["business", "productivity", "design"],
+  "screenshots": [
+    {
+      "src": "https://images.unsplash.com/photo-1707226845968-c7e5e3409e35?w=1280&h=720&fit=crop&crop=center",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}
