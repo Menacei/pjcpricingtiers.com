@@ -55,12 +55,30 @@ function App() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [socialPosts, setSocialPosts] = useState([]);
   const [socialPlatforms, setSocialPlatforms] = useState([]);
+  const [leadMagnets, setLeadMagnets] = useState([]);
+  const [showLeadMagnetModal, setShowLeadMagnetModal] = useState(false);
+  const [selectedLeadMagnet, setSelectedLeadMagnet] = useState(null);
+  const [showNewsletterPopup, setShowNewsletterPopup] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
     phone: "",
     service: "",
     message: ""
+  });
+  const [leadForm, setLeadForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    budget_range: "",
+    project_type: "",
+    timeline: ""
+  });
+  const [newsletterForm, setNewsletterForm] = useState({
+    email: "",
+    name: "",
+    interests: []
   });
   const chatEndRef = useRef(null);
 
