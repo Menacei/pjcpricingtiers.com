@@ -111,9 +111,26 @@ function App() {
       }
     };
 
+    const fetchLeadMagnets = async () => {
+      try {
+        const response = await axios.get(`${API}/lead-magnets`);
+        setLeadMagnets(response.data);
+      } catch (error) {
+        console.error("Error fetching lead magnets:", error);
+      }
+    };
+
     fetchBlogPosts();
     fetchSocialPlatforms();
     fetchSocialPosts();
+    fetchLeadMagnets();
+
+    // Show newsletter popup after 30 seconds
+    const timer = setTimeout(() => {
+      setShowNewsletterPopup(true);
+    }, 30000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Check for payment return from Stripe
