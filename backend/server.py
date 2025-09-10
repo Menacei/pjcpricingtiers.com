@@ -1167,7 +1167,7 @@ async def get_sitemap():
     """Generate XML sitemap for SEO"""
     from fastapi.responses import Response
     
-    base_url = "https://pjcwebdesigns.solutions"
+    base_url = "https://pjc-pricing-tiers.preview.emergentagent.com"
     
     # Get blog posts for sitemap
     try:
