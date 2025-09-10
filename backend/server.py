@@ -442,6 +442,52 @@ async def initialize_social_posts():
     except Exception as e:
         logging.error(f"Failed to initialize social media posts: {str(e)}")
 
+async def initialize_lead_magnets():
+    """Initialize sample lead magnets if none exist"""
+    try:
+        existing_magnets = await db.lead_magnets.count_documents({})
+        if existing_magnets == 0:
+            lead_magnets = [
+                {
+                    "title": "Web Design Checklist for Startups",
+                    "description": "Essential 25-point checklist to ensure your startup website covers all the basics for success.",
+                    "magnet_type": "checklist",
+                    "file_url": "#",
+                    "active": True
+                },
+                {
+                    "title": "Free 30-Minute Strategy Consultation",
+                    "description": "Get personalized advice for your web design project. Discuss your goals, timeline, and budget with our experts.",
+                    "magnet_type": "consultation",
+                    "file_url": "#",
+                    "active": True
+                },
+                {
+                    "title": "Website Cost Calculator & Planning Template",
+                    "description": "Plan your website budget with our comprehensive cost calculator and project planning template.",
+                    "magnet_type": "template",
+                    "file_url": "#",
+                    "active": True
+                },
+                {
+                    "title": "Instant Website Quote",
+                    "description": "Get a personalized quote for your website project in under 2 minutes.",
+                    "magnet_type": "quote",
+                    "file_url": "#",
+                    "active": True
+                }
+            ]
+            
+            for magnet_data in lead_magnets:
+                magnet = LeadMagnet(**magnet_data)
+                magnet_dict = magnet.dict()
+                magnet_dict['timestamp'] = magnet_dict['timestamp'].isoformat()
+                await db.lead_magnets.insert_one(magnet_dict)
+            
+            logging.info("Sample lead magnets initialized")
+    except Exception as e:
+        logging.error(f"Failed to initialize lead magnets: {str(e)}")
+
 # Existing routes
 @api_router.get("/")
 async def root():
