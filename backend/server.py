@@ -160,6 +160,65 @@ class SocialMediaPostCreate(BaseModel):
     hashtags: List[str] = []
     featured: bool = False
 
+# Lead Generation Models
+class Lead(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    email: str
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    company: Optional[str] = None
+    website: Optional[str] = None
+    budget_range: Optional[str] = None
+    project_type: Optional[str] = None
+    timeline: Optional[str] = None
+    lead_source: str = "website"
+    lead_magnet: Optional[str] = None
+    lead_score: int = 0
+    status: str = "new"  # new, qualified, contacted, converted, lost
+    notes: Optional[str] = None
+    last_activity: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class LeadCreate(BaseModel):
+    email: str
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    company: Optional[str] = None
+    website: Optional[str] = None
+    budget_range: Optional[str] = None
+    project_type: Optional[str] = None
+    timeline: Optional[str] = None
+    lead_source: str = "website"
+    lead_magnet: Optional[str] = None
+
+class LeadActivity(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    lead_id: str
+    activity_type: str  # page_view, form_fill, email_open, email_click, etc.
+    activity_data: Optional[Dict] = None
+    score_change: int = 0
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class NewsletterSubscription(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    email: str
+    name: Optional[str] = None
+    interests: List[str] = []
+    source: str = "website"
+    status: str = "active"  # active, unsubscribed
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class LeadMagnet(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    magnet_type: str  # ebook, checklist, consultation, quote, template
+    file_url: Optional[str] = None
+    download_count: int = 0
+    conversion_rate: float = 0.0
+    active: bool = True
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # Fixed pricing packages (SECURITY: Never allow frontend to set prices)
 PACKAGES = {
     "starter": {
