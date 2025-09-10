@@ -1257,7 +1257,7 @@ async def get_seo_meta():
         "title": "PJC Web Designs - Affordable Website Design for Startups",
         "description": "Professional website design for startups and growing businesses. Modern, mobile-responsive websites starting at just $199.",
         "keywords": "web design, startup websites, affordable web design, mobile responsive design, SEO optimization, small business websites",
-        "canonical": "https://pjcwebdesigns.solutions",
+        "canonical": "https://pjc-pricing-tiers.preview.emergentagent.com",
         "og_image": "https://images.unsplash.com/photo-1707226845968-c7e5e3409e35",
         "structured_data": {
             "@context": "https://schema.org",
