@@ -1755,6 +1755,7 @@ logger = logging.getLogger(__name__)
 async def startup_event():
     await initialize_blog_posts()
     await initialize_social_posts()
+    await initialize_lead_magnets()
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
