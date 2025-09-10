@@ -1383,6 +1383,310 @@ async def get_performance_data():
         logging.error(f"Performance data error: {str(e)}")
         return {"error": "Failed to get performance data"}
 
+# Lead Generation System Endpoints
+@api_router.post("/leads", response_model=Lead)
+async def create_lead(lead_data: LeadCreate):
+    """Create a new lead with automatic scoring"""
+    try:
+        # Calculate initial lead score
+        score = calculate_lead_score(lead_data)
+        
+        lead = Lead(
+            **lead_data.dict(),
+            lead_score=score,
+            status="qualified" if score >= 50 else "new"
+        )
+        
+        lead_dict = lead.dict()
+        lead_dict['timestamp'] = lead_dict['timestamp'].isoformat()
+        lead_dict['last_activity'] = lead_dict['last_activity'].isoformat()
+        await db.leads.insert_one(lead_dict)
+        
+        # Log lead creation activity
+        await log_lead_activity(lead.id, "lead_created", {"source": lead_data.lead_source}, 10)
+        
+        # Send welcome email (would integrate with email service)
+        await send_lead_welcome_email(lead.email, lead.name)
+        
+        return lead
+    except Exception as e:
+        logging.error(f"Create lead error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create lead")
+
+@api_router.get("/leads", response_model=List[Lead])
+async def get_leads(status: Optional[str] = None, limit: int = 50):
+    """Get leads with optional status filter"""
+    try:
+        filter_query = {}
+        if status:
+            filter_query["status"] = status
+            
+        leads = await db.leads.find(filter_query).sort("timestamp", -1).limit(limit).to_list(limit)
+        
+        for lead in leads:
+            if isinstance(lead.get('timestamp'), str):
+                lead['timestamp'] = datetime.fromisoformat(lead['timestamp'])
+            if isinstance(lead.get('last_activity'), str):
+                lead['last_activity'] = datetime.fromisoformat(lead['last_activity'])
+        
+        return [Lead(**lead) for lead in leads]
+    except Exception as e:
+        logging.error(f"Get leads error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get leads")
+
+@api_router.post("/leads/{lead_id}/activity")
+async def track_lead_activity(lead_id: str, activity_type: str, activity_data: Optional[Dict] = None):
+    """Track lead activity and update score"""
+    try:
+        score_change = get_activity_score(activity_type)
+        
+        await log_lead_activity(lead_id, activity_type, activity_data, score_change)
+        
+        # Update lead score and last activity
+        await db.leads.update_one(
+            {"id": lead_id},
+            {
+                "$inc": {"lead_score": score_change},
+                "$set": {"last_activity": datetime.now(timezone.utc).isoformat()}
+            }
+        )
+        
+        return {"message": "Activity tracked", "score_change": score_change}
+    except Exception as e:
+        logging.error(f"Track activity error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to track activity")
+
+@api_router.post("/newsletter/subscribe")
+async def subscribe_newsletter(email: str, name: Optional[str] = None, interests: List[str] = []):
+    """Subscribe to newsletter"""
+    try:
+        # Check if already subscribed
+        existing = await db.newsletter_subscriptions.find_one({"email": email})
+        if existing:
+            return {"message": "Already subscribed", "status": "existing"}
+        
+        subscription = NewsletterSubscription(
+            email=email,
+            name=name,
+            interests=interests
+        )
+        
+        sub_dict = subscription.dict()
+        sub_dict['timestamp'] = sub_dict['timestamp'].isoformat()
+        await db.newsletter_subscriptions.insert_one(sub_dict)
+        
+        # Also create/update lead
+        lead_data = LeadCreate(
+            email=email,
+            name=name,
+            lead_source="newsletter",
+            lead_magnet="newsletter_signup"
+        )
+        
+        try:
+            existing_lead = await db.leads.find_one({"email": email})
+            if not existing_lead:
+                await create_lead(lead_data)
+            else:
+                await log_lead_activity(existing_lead["id"], "newsletter_signup", {}, 15)
+        except:
+            pass  # Don't fail if lead creation fails
+        
+        return {"message": "Newsletter subscription successful", "status": "subscribed"}
+    except Exception as e:
+        logging.error(f"Newsletter subscription error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to subscribe to newsletter")
+
+@api_router.get("/lead-magnets")
+async def get_lead_magnets():
+    """Get available lead magnets"""
+    try:
+        magnets = await db.lead_magnets.find({"active": True}).to_list(10)
+        return magnets
+    except Exception as e:
+        logging.error(f"Get lead magnets error: {str(e)}")
+        return []
+
+@api_router.post("/lead-magnets/{magnet_id}/download")
+async def download_lead_magnet(magnet_id: str, email: str, name: Optional[str] = None):
+    """Download lead magnet and capture lead"""
+    try:
+        # Get lead magnet
+        magnet = await db.lead_magnets.find_one({"id": magnet_id, "active": True})
+        if not magnet:
+            raise HTTPException(status_code=404, detail="Lead magnet not found")
+        
+        # Create/update lead
+        lead_data = LeadCreate(
+            email=email,
+            name=name,
+            lead_source="lead_magnet",
+            lead_magnet=magnet["title"]
+        )
+        
+        existing_lead = await db.leads.find_one({"email": email})
+        if not existing_lead:
+            await create_lead(lead_data)
+        else:
+            await log_lead_activity(existing_lead["id"], "magnet_download", {"magnet": magnet["title"]}, 25)
+        
+        # Update download count
+        await db.lead_magnets.update_one(
+            {"id": magnet_id},
+            {"$inc": {"download_count": 1}}
+        )
+        
+        return {
+            "message": "Lead magnet accessed successfully",
+            "download_url": magnet.get("file_url", "#"),
+            "title": magnet["title"]
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Download lead magnet error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to download lead magnet")
+
+@api_router.get("/leads/analytics")
+async def get_lead_analytics():
+    """Get lead generation analytics"""
+    try:
+        # Total leads
+        total_leads = await db.leads.count_documents({})
+        
+        # Leads by status
+        leads_by_status = await db.leads.aggregate([
+            {"$group": {"_id": "$status", "count": {"$sum": 1}}}
+        ]).to_list(10)
+        
+        # Leads by source
+        leads_by_source = await db.leads.aggregate([
+            {"$group": {"_id": "$lead_source", "count": {"$sum": 1}}}
+        ]).to_list(10)
+        
+        # Average lead score
+        avg_score = await db.leads.aggregate([
+            {"$group": {"_id": None, "avg_score": {"$avg": "$lead_score"}}}
+        ]).to_list(1)
+        
+        # Recent leads (last 7 days)
+        seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+        recent_leads = await db.leads.count_documents({
+            "timestamp": {"$gte": seven_days_ago.isoformat()}
+        })
+        
+        # Newsletter subscribers
+        newsletter_subs = await db.newsletter_subscriptions.count_documents({"status": "active"})
+        
+        return {
+            "total_leads": total_leads,
+            "leads_by_status": leads_by_status,
+            "leads_by_source": leads_by_source,
+            "average_score": avg_score[0]["avg_score"] if avg_score else 0,
+            "recent_leads": recent_leads,
+            "newsletter_subscribers": newsletter_subs,
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logging.error(f"Lead analytics error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get lead analytics")
+
+# Helper Functions
+def calculate_lead_score(lead_data: LeadCreate) -> int:
+    """Calculate initial lead score based on provided information"""
+    score = 0
+    
+    # Basic contact info
+    if lead_data.name:
+        score += 10
+    if lead_data.phone:
+        score += 15
+    if lead_data.company:
+        score += 20
+    if lead_data.website:
+        score += 10
+    
+    # Budget and project info
+    budget_scores = {
+        "under_500": 5,
+        "500_1000": 25,
+        "1000_5000": 50,
+        "5000_10000": 75,
+        "over_10000": 100
+    }
+    if lead_data.budget_range and lead_data.budget_range in budget_scores:
+        score += budget_scores[lead_data.budget_range]
+    
+    # Timeline urgency
+    timeline_scores = {
+        "immediate": 50,
+        "1_month": 40,
+        "3_months": 30,
+        "6_months": 20,
+        "flexible": 10
+    }
+    if lead_data.timeline and lead_data.timeline in timeline_scores:
+        score += timeline_scores[lead_data.timeline]
+    
+    # Project type
+    project_scores = {
+        "new_website": 30,
+        "redesign": 35,
+        "ecommerce": 40,
+        "web_app": 45,
+        "maintenance": 15
+    }
+    if lead_data.project_type and lead_data.project_type in project_scores:
+        score += project_scores[lead_data.project_type]
+    
+    return min(score, 100)  # Cap at 100
+
+def get_activity_score(activity_type: str) -> int:
+    """Get score change for different activities"""
+    activity_scores = {
+        "lead_created": 10,
+        "page_view": 2,
+        "pricing_view": 10,
+        "contact_form": 25,
+        "phone_call": 30,
+        "email_open": 5,
+        "email_click": 10,
+        "newsletter_signup": 15,
+        "magnet_download": 25,
+        "quote_request": 40,
+        "consultation_booked": 50
+    }
+    return activity_scores.get(activity_type, 0)
+
+async def log_lead_activity(lead_id: str, activity_type: str, activity_data: Optional[Dict], score_change: int):
+    """Log lead activity"""
+    try:
+        activity = LeadActivity(
+            lead_id=lead_id,
+            activity_type=activity_type,
+            activity_data=activity_data,
+            score_change=score_change
+        )
+        
+        activity_dict = activity.dict()
+        activity_dict['timestamp'] = activity_dict['timestamp'].isoformat()
+        await db.lead_activities.insert_one(activity_dict)
+    except Exception as e:
+        logging.error(f"Log activity error: {str(e)}")
+
+async def send_lead_welcome_email(email: str, name: Optional[str]):
+    """Send welcome email to new lead (placeholder for email integration)"""
+    try:
+        # This would integrate with your email service (SendGrid, Mailgun, etc.)
+        logging.info(f"Sending welcome email to {email} ({name})")
+        # Email content would include:
+        # - Welcome message
+        # - Link to free consultation
+        # - Portfolio examples
+        # - Contact information
+    except Exception as e:
+        logging.error(f"Send welcome email error: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
