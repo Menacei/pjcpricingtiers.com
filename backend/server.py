@@ -241,6 +241,25 @@ PACKAGES = {
     }
 }
 
+# NewReach AI Consultant Agency Pricing
+AI_CONSULTING_PACKAGES = {
+    "ai_starter": {
+        "monthly_price": 197.00,
+        "annual_price": 1970.00,  # Save 2 months
+        "service_type": "ai_consulting"
+    },
+    "ai_growth": {
+        "monthly_price": 397.00,
+        "annual_price": 3970.00,  # Save 2 months
+        "service_type": "ai_consulting"
+    },
+    "ai_premium": {
+        "monthly_price": 697.00,
+        "annual_price": 6970.00,  # Save 2 months
+        "service_type": "ai_consulting"
+    }
+}
+
 # PayPal Environment Setup
 def get_paypal_client():
     client_id = os.environ.get('PAYPAL_CLIENT_ID')
