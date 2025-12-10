@@ -913,7 +913,7 @@ async def create_blog_post(post_data: BlogPostCreate):
 async def track_social_share(post_id: str, platform: str):
     try:
         # Generate share URLs based on platform
-        base_url = "https://pjc-pricing-tiers.preview.emergentagent.com"
+        base_url = "https://patjc-digital.preview.emergentagent.com"
         post_url = f"{base_url}/blog/{post_id}"
         
         share_urls = {
@@ -1291,7 +1291,7 @@ async def get_sitemap():
     """Generate XML sitemap for SEO"""
     from fastapi.responses import Response
     
-    base_url = "https://pjc-pricing-tiers.preview.emergentagent.com"
+    base_url = "https://patjc-digital.preview.emergentagent.com"
     
     # Get blog posts for sitemap
     try:
@@ -1381,7 +1381,7 @@ async def get_seo_meta():
         "title": "PJC Web Designs - Affordable Website Design for Startups",
         "description": "Professional website design for startups and growing businesses. Modern, mobile-responsive websites starting at just $199.",
         "keywords": "web design, startup websites, affordable web design, mobile responsive design, SEO optimization, small business websites",
-        "canonical": "https://pjc-pricing-tiers.preview.emergentagent.com",
+        "canonical": "https://patjc-digital.preview.emergentagent.com",
         "og_image": "https://images.unsplash.com/photo-1707226845968-c7e5e3409e35",
         "structured_data": {
             "@context": "https://schema.org",
