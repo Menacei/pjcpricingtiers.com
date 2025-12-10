@@ -647,10 +647,33 @@ function App() {
             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 font-fredoka">
               PJC Web Designs
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Professional websites for startups and growing businesses. 
-              Starting at just $325 – final price determined by your page count and specific needs.
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              AI-Powered Web Design & Automation for Small Businesses
+            </h2>
+            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
+              I'm Pat Church, and I build websites, automation, and AI tools that actually make money – not just look pretty. 
+              Based in Kansas City, MO, serving businesses that need real results.
             </p>
+            
+            {/* Key Benefits */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-4xl mx-auto">
+              <div className="bg-slate-800/50 rounded-lg p-4 text-center">
+                <CheckCircle className="w-6 h-6 text-cyan-400 mx-auto mb-2" />
+                <p className="text-gray-300 text-sm">AI-integrated websites & landing pages</p>
+              </div>
+              <div className="bg-slate-800/50 rounded-lg p-4 text-center">
+                <CheckCircle className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                <p className="text-gray-300 text-sm">Automation for leads & follow-ups</p>
+              </div>
+              <div className="bg-slate-800/50 rounded-lg p-4 text-center">
+                <CheckCircle className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                <p className="text-gray-300 text-sm">Custom AI tools & research crawlers</p>
+              </div>
+              <div className="bg-slate-800/50 rounded-lg p-4 text-center">
+                <CheckCircle className="w-6 h-6 text-pink-400 mx-auto mb-2" />
+                <p className="text-gray-300 text-sm">Branding & social content design</p>
+              </div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
