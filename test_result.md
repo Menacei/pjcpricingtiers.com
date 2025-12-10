@@ -29,15 +29,18 @@ backend:
 
   - task: "Stripe Payment Integration"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Previous handoff noted 500 error. Needs testing after portfolio transformation."
+      - working: false
+        agent: "testing"
+        comment: "CRITICAL: Stripe payment integration failing due to invalid STRIPE_API_KEY environment variable. Current key 'sk_test_emergent' is incomplete/invalid. Payment modal opens correctly, but Stripe checkout session creation returns 500 error. Backend logs show 'Stripe configuration error'. Need valid Stripe test key to complete payment flow testing."
 
 frontend:
   - task: "Personal Portfolio Hero Section"
