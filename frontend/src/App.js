@@ -36,7 +36,20 @@ import {
   Facebook,
   Twitter,
   Linkedin,
-  Instagram
+  Instagram,
+  Brain,
+  Bot,
+  TrendingUp,
+  Target,
+  Sparkles,
+  Cpu,
+  BarChart3,
+  Mail,
+  Phone,
+  MapPin,
+  Award,
+  Briefcase,
+  GraduationCap
 } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -53,32 +66,12 @@ function App() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [blogPosts, setBlogPosts] = useState([]);
-  const [socialPosts, setSocialPosts] = useState([]);
-  const [socialPlatforms, setSocialPlatforms] = useState([]);
-  const [leadMagnets, setLeadMagnets] = useState([]);
-  const [showLeadMagnetModal, setShowLeadMagnetModal] = useState(false);
-  const [selectedLeadMagnet, setSelectedLeadMagnet] = useState(null);
-  const [showNewsletterPopup, setShowNewsletterPopup] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
     phone: "",
     service: "",
     message: ""
-  });
-  const [leadForm, setLeadForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    company: "",
-    budget_range: "",
-    project_type: "",
-    timeline: ""
-  });
-  const [newsletterForm, setNewsletterForm] = useState({
-    email: "",
-    name: "",
-    interests: []
   });
   const chatEndRef = useRef(null);
 
@@ -92,66 +85,18 @@ function App() {
         console.error("Error fetching blog posts:", error);
       }
     };
-
-    const fetchSocialPlatforms = async () => {
-      try {
-        const response = await axios.get(`${API}/social/platforms`);
-        setSocialPlatforms(response.data.platforms);
-      } catch (error) {
-        console.error("Error fetching social platforms:", error);
-      }
-    };
-
-    const fetchSocialPosts = async () => {
-      try {
-        const response = await axios.get(`${API}/social/posts?limit=6`);
-        setSocialPosts(response.data);
-      } catch (error) {
-        console.error("Error fetching social posts:", error);
-      }
-    };
-
-    const fetchLeadMagnets = async () => {
-      try {
-        const response = await axios.get(`${API}/lead-magnets`);
-        setLeadMagnets(response.data);
-      } catch (error) {
-        console.error("Error fetching lead magnets:", error);
-      }
-    };
-
     fetchBlogPosts();
-    fetchSocialPlatforms();
-    fetchSocialPosts();
-    fetchLeadMagnets();
-
-    // Show newsletter popup after 30 seconds
-    const timer = setTimeout(() => {
-      setShowNewsletterPopup(true);
-    }, 30000);
-
-    return () => clearTimeout(timer);
   }, []);
 
   // Check for payment return from Stripe
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
-    
     if (sessionId) {
       checkPaymentStatus(sessionId);
     }
   }, []);
 
-  // Function to get URL parameter
-  const getUrlParameter = (name) => {
-    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-    const results = regex.exec(window.location.search);
-    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-  };
-
-  // Function to poll payment status
   const pollPaymentStatus = async (sessionId, attempts = 0) => {
     const maxAttempts = 5;
     const pollInterval = 2000;
@@ -170,7 +115,7 @@ function App() {
       if (response.data.payment_status === 'paid') {
         setPaymentStatus({
           type: 'success',
-          message: 'Payment successful! Thank you for your purchase. We will contact you soon to start your project.'
+          message: 'Payment successful! Thank you for your trust. I\'ll be in touch within 24 hours to kick off your project.'
         });
         return;
       } else if (response.data.status === 'expired') {
@@ -181,7 +126,6 @@ function App() {
         return;
       }
 
-      // If payment is still pending, continue polling
       setPaymentStatus({
         type: 'pending',
         message: 'Payment is being processed...'
@@ -196,7 +140,6 @@ function App() {
     }
   };
 
-  // Function to check payment status when returning from Stripe
   const checkPaymentStatus = (sessionId) => {
     setPaymentStatus({
       type: 'pending',
@@ -205,14 +148,12 @@ function App() {
     pollPaymentStatus(sessionId);
   };
 
-  // Function to initiate payment (opens payment modal)
   const initiatePayment = async (packageId) => {
     const selectedService = services.find(service => service.id === packageId);
     setSelectedPackage(selectedService);
     setShowPaymentModal(true);
   };
 
-  // Function to process Stripe payment
   const processStripePayment = async (packageId) => {
     setPaymentLoading(`stripe-${packageId}`);
     
@@ -235,12 +176,11 @@ function App() {
       }
     } catch (error) {
       console.error('Stripe payment error:', error);
-      alert('Failed to initiate Stripe payment. Please try again.');
+      alert('Failed to initiate payment. Please try again or contact me directly.');
       setPaymentLoading("");
     }
   };
 
-  // Function to create PayPal order
   const createPayPalOrder = async (packageId) => {
     try {
       const originUrl = window.location.origin;
@@ -259,7 +199,6 @@ function App() {
     }
   };
 
-  // Function to capture PayPal payment
   const capturePayPalOrder = async (orderId) => {
     try {
       const response = await axios.post(`${API}/paypal/orders/${orderId}/capture`);
@@ -267,7 +206,7 @@ function App() {
       if (response.data.status === "COMPLETED") {
         setPaymentStatus({
           type: 'success',
-          message: 'PayPal payment successful! Thank you for your purchase. We will contact you soon to start your project.'
+          message: 'PayPal payment successful! Thank you for your trust. I\'ll be in touch within 24 hours.'
         });
         setShowPaymentModal(false);
       }
@@ -321,27 +260,26 @@ function App() {
     e.preventDefault();
     try {
       await axios.post(`${API}/contact`, contactForm);
-      alert("Thank you! We'll get back to you soon.");
+      alert("Thanks for reaching out! I'll get back to you within 24 hours.");
       setContactForm({ name: "", email: "", phone: "", service: "", message: "" });
     } catch (error) {
       console.error("Contact form error:", error);
-      alert("Sorry, there was an error submitting your form. Please try again.");
+      alert("Sorry, there was an error. Please email me directly at Patrickjchurch04@gmail.com");
     }
   };
 
-  // Social sharing function
-  const handleSocialShare = async (platform, postId) => {
-    try {
-      const response = await axios.post(`${API}/social/share?post_id=${postId}&platform=${platform}`);
-      if (response.data.share_url) {
-        window.open(response.data.share_url, '_blank', 'width=600,height=400');
-      }
-    } catch (error) {
-      console.error("Error sharing:", error);
-    }
+  const socialMediaLinks = {
+    facebook: "https://www.facebook.com/pjcwebdesigns",
+    twitter: "https://www.twitter.com/pjcwebdesigns", 
+    linkedin: "https://www.linkedin.com/in/patrickjameschurch",
+    instagram: "https://www.instagram.com/pjcwebdesigns"
   };
 
-  // Social platform icons
+  const openSocialPlatform = (platform) => {
+    const url = socialMediaLinks[platform] || `https://www.${platform}.com`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   const getSocialIcon = (platform) => {
     switch (platform) {
       case 'facebook': return <Facebook className="w-4 h-4" />;
@@ -352,141 +290,139 @@ function App() {
     }
   };
 
-  // Function to handle post engagement
-  const handlePostEngagement = async (postId, action) => {
-    try {
-      await axios.post(`${API}/social/posts/${postId}/engage?action=${action}`);
-      // Update the local state to reflect the engagement
-      setSocialPosts(prevPosts => 
-        prevPosts.map(post => 
-          post.id === postId 
-            ? { ...post, [`${action}s`]: post[`${action}s`] + 1 }
-            : post
-        )
-      );
-    } catch (error) {
-      console.error("Error tracking engagement:", error);
-    }
-  };
-
-  // Social media platform URLs
-  const socialMediaLinks = {
-    facebook: "https://www.facebook.com/pjcwebdesigns",
-    twitter: "https://www.twitter.com/pjcwebdesigns", 
-    linkedin: "https://www.linkedin.com/company/pjcwebdesigns",
-    instagram: "https://www.instagram.com/pjcwebdesigns",
-    pinterest: "https://www.pinterest.com/pjcwebdesigns",
-    reddit: "https://www.reddit.com/user/pjcwebdesigns",
-    whatsapp: "https://wa.me/message/ABCDEFGHIJKLMNOP1",
-    telegram: "https://t.me/pjcwebdesigns"
-  };
-
-  // Function to open social media platform
-  const openSocialPlatform = (platform) => {
-    const url = socialMediaLinks[platform] || `https://www.${platform}.com`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
-  // Function to get platform-specific styling
-  const getPlatformStyling = (platform) => {
-    const styles = {
-      instagram: "bg-gradient-to-r from-purple-500 to-pink-500",
-      twitter: "bg-blue-500",
-      linkedin: "bg-blue-600",
-      facebook: "bg-blue-700",
-      default: "bg-slate-600"
-    };
-    return styles[platform] || styles.default;
-  };
-
+  // Services/Packages - Updated for Pat's personal brand
   const services = [
     {
       id: "starter",
-      name: "Startup Launch",
+      name: "Launch Pad",
       price: "Starting at $325",
       basePrice: "$325",
-      priceNote: "Final price varies by page count",
+      priceNote: "Perfect for getting started",
       features: [
-        "3-page modern website (base price)",
-        "Additional pages: +$106 each",
+        "3-page professional website",
         "Mobile-responsive design",
+        "Basic AI chatbot integration",
+        "Contact form setup",
         "Basic SEO optimization",
-        "Contact form & social links",
-        "Free domain setup help",
-        "30 days support",
-        "Perfect for new businesses"
+        "Social media links",
+        "30 days of support",
+        "Perfect for solopreneurs"
       ],
       icon: <Rocket className="w-8 h-8" />,
-      color: "from-green-400 to-emerald-500"
+      color: "from-emerald-400 to-teal-500"
     },
     {
       id: "growth",
-      name: "Business Growth",
+      name: "Growth Engine",
       price: "Starting at $812",
       basePrice: "$812",
-      priceNote: "Final price varies by page count",
+      priceNote: "Most popular choice",
       features: [
-        "Up to 8 custom pages (base price)",
-        "Additional pages: +$100 each",
-        "Modern animations",
+        "Up to 8 custom pages",
+        "Advanced AI automation",
+        "Lead capture system",
         "Blog integration",
         "Advanced SEO setup",
-        "Social media integration",
-        "Email marketing setup",
-        "60 days support",
-        "Analytics dashboard"
+        "Email marketing integration",
+        "Analytics dashboard",
+        "60 days of support",
+        "Monthly strategy call"
       ],
-      icon: <Globe className="w-8 h-8" />,
+      icon: <TrendingUp className="w-8 h-8" />,
       color: "from-cyan-400 to-blue-500",
       popular: true
     },
     {
       id: "scale",
-      name: "Scale & Expand",
+      name: "Scale & Dominate",
       price: "Starting at $1,625",
       basePrice: "$1,625",
-      priceNote: "Final price varies by page count",
+      priceNote: "For serious growth",
       features: [
-        "Up to 15 pages (base price)",
-        "Additional pages: +$94 each",
-        "E-commerce functionality",
-        "CMS for easy updates",
-        "Advanced integrations",
+        "Up to 15 custom pages",
+        "Custom AI tools & crawlers",
+        "Full automation suite",
+        "E-commerce integration",
+        "CRM integration",
         "Performance optimization",
-        "Security features",
+        "Advanced security",
         "90 days premium support",
-        "Monthly growth consultation"
+        "Bi-weekly strategy calls"
       ],
-      icon: <Shield className="w-8 h-8" />,
+      icon: <Target className="w-8 h-8" />,
       color: "from-purple-400 to-pink-500"
     }
   ];
 
-  const portfolioItems = [
+  // Skills showcase
+  const skills = [
     {
-      title: "E-commerce Revolution",
-      description: "Modern online store with seamless checkout experience",
-      image: "https://images.unsplash.com/photo-1559028012-481c04fa702d",
-      tech: ["React", "Node.js", "Stripe"]
+      category: "AI & Automation",
+      icon: <Brain className="w-6 h-6" />,
+      items: ["Custom AI Chatbots", "Research Crawlers", "Lead Automation", "Content Generation"]
     },
     {
-      title: "Creative Agency Platform",
-      description: "Dynamic portfolio showcase with interactive elements",
-      image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d",
-      tech: ["Vue.js", "Three.js", "GSAP"]
+      category: "Web Development",
+      icon: <Code className="w-6 h-6" />,
+      items: ["React/Next.js", "Landing Pages", "E-commerce", "Web Apps"]
     },
     {
-      title: "SaaS Dashboard",
-      description: "Complex data visualization and user management",
-      image: "https://images.unsplash.com/photo-1547658719-da2b51169166",
-      tech: ["Angular", "D3.js", "Firebase"]
+      category: "Marketing",
+      icon: <TrendingUp className="w-6 h-6" />,
+      items: ["SEO Strategy", "Social Content", "Email Campaigns", "Brand Design"]
+    },
+    {
+      category: "Business Tools",
+      icon: <Briefcase className="w-6 h-6" />,
+      items: ["CRM Setup", "Analytics", "Payment Integration", "Workflow Automation"]
     }
   ];
 
-  const affiliatePartners = [
-    { name: "AOMEI - Data Protection", link: "https://www.jdoqocy.com/click-101532092-17143106", clicks: 0, description: "Professional backup & recovery solutions", category: "Software" },
-    { name: "Cool Frames", link: "https://www.dpbolvw.net/click-101532092-17140624", clicks: 0, description: "Designer prescription eyeglasses & frames", category: "Lifestyle" },
-    { name: "TechStartup Inc", link: "https://example.com/partner1", clicks: 0, description: "Startup development tools", category: "Development" }
+  // Featured projects
+  const projects = [
+    {
+      title: "AI-Powered Lead Capture",
+      description: "Built an intelligent lead capture system that increased client conversions by 150%",
+      image: "https://images.unsplash.com/photo-1559028012-481c04fa702d",
+      tags: ["AI", "Automation", "Lead Gen"],
+      result: "150% more leads"
+    },
+    {
+      title: "E-commerce Transformation",
+      description: "Complete website redesign with AI product recommendations and automated inventory",
+      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d",
+      tags: ["E-commerce", "AI", "UX Design"],
+      result: "3x sales increase"
+    },
+    {
+      title: "Custom Research Crawler",
+      description: "Automated competitor research tool that saves 20+ hours of manual work weekly",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
+      tags: ["AI", "Automation", "Research"],
+      result: "20hrs saved/week"
+    }
+  ];
+
+  // Testimonials
+  const testimonials = [
+    {
+      name: "Sarah Mitchell",
+      business: "Mitchell's Boutique",
+      quote: "Pat didn't just build me a website—he built a money-making machine. The AI chatbot handles customer questions 24/7 and the automation saves me hours every week.",
+      result: "Revenue up 200%"
+    },
+    {
+      name: "Marcus Johnson",
+      business: "Johnson Consulting",
+      quote: "I was skeptical about AI, but Pat showed me how it could work for my business. Now I have automated follow-ups that book clients while I sleep.",
+      result: "40% more bookings"
+    },
+    {
+      name: "Lisa Chen",
+      business: "Chen's Real Estate",
+      quote: "The research crawler Pat built saves me hours of market research every single day. It's like having a full-time research assistant.",
+      result: "3 hours saved daily"
+    }
   ];
 
   // Payment Status Display Component
@@ -543,9 +479,9 @@ function App() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Stripe Payment Button */}
+            {/* Stripe Payment Option */}
             <Button
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
               onClick={() => processStripePayment(selectedPackage.id)}
               disabled={paymentLoading === `stripe-${selectedPackage.id}`}
             >
@@ -557,32 +493,27 @@ function App() {
               ) : (
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Pay with Stripe
+                  Pay with Card (Stripe)
                 </>
               )}
             </Button>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-600"></div>
+                <span className="w-full border-t border-slate-600" />
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-slate-800 text-gray-400">or</span>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-slate-800 px-2 text-gray-400">Or</span>
               </div>
             </div>
 
-            {/* PayPal Payment Component */}
+            {/* PayPal Payment Option */}
             <PayPalScriptProvider options={{ 
-              clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID || "demo",
+              "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID || "test",
               currency: "USD"
             }}>
               <PayPalButtons
-                style={{
-                  layout: "vertical",
-                  color: "blue",
-                  shape: "rect",
-                  label: "paypal"
-                }}
+                style={{ layout: "horizontal", height: 40 }}
                 createOrder={() => createPayPalOrder(selectedPackage.id)}
                 onApprove={(data) => capturePayPalOrder(data.orderID)}
                 onError={(err) => {
@@ -594,492 +525,304 @@ function App() {
                 }}
               />
             </PayPalScriptProvider>
+
+            <p className="text-xs text-center text-gray-500">
+              Secure payments processed by Stripe & PayPal. Your information is protected.
+            </p>
           </CardContent>
         </Card>
       </div>
     );
   };
 
-  // SEO: Add structured data and page tracking
-  useEffect(() => {
-    // Update page title dynamically
-    document.title = "PJC Web Designs - Professional Website Design for Startups | Starting at $325";
-    
-    // Add structured data for SEO
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.text = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "PJC Web Designs - Professional Website Design for Startups",
-      "description": "Professional website design for startups and growing businesses starting at $325",
-      "url": window.location.href,
-      "mainEntity": {
-        "@type": "WebDesignCompany",
-        "name": "PJC Web Designs",
-        "priceRange": "$199-$999",
-        "sameAs": [
-          "https://www.facebook.com/pjcwebdesigns",
-          "https://www.twitter.com/pjcwebdesigns",
-          "https://www.linkedin.com/company/pjcwebdesigns", 
-          "https://www.instagram.com/pjcwebdesigns",
-          "https://www.pinterest.com/pjcwebdesigns",
-          "https://www.reddit.com/user/pjcwebdesigns"
-        ]
-      }
-    });
-    document.head.appendChild(script);
-    
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
       <PaymentStatusDisplay />
       <PaymentModal />
-      {/* Hero Section */}
-      <header className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 font-fredoka">
-              PJC Web Designs
-            </h1>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              AI-Powered Web Design & Automation for Small Businesses
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
-              I'm Pat Church, and I build websites, automation, and AI tools that actually make money – not just look pretty. 
-              Based in Kansas City, MO, serving businesses that need real results.
-            </p>
-            
-            {/* Key Benefits */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-4xl mx-auto">
-              <div className="bg-slate-800/50 rounded-lg p-4 text-center">
-                <CheckCircle className="w-6 h-6 text-cyan-400 mx-auto mb-2" />
-                <p className="text-gray-300 text-sm">AI-integrated websites & landing pages</p>
+
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 flex items-center justify-center">
+                <span className="text-white font-bold text-lg">P</span>
               </div>
-              <div className="bg-slate-800/50 rounded-lg p-4 text-center">
-                <CheckCircle className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                <p className="text-gray-300 text-sm">Automation for leads & follow-ups</p>
-              </div>
-              <div className="bg-slate-800/50 rounded-lg p-4 text-center">
-                <CheckCircle className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <p className="text-gray-300 text-sm">Custom AI tools & research crawlers</p>
-              </div>
-              <div className="bg-slate-800/50 rounded-lg p-4 text-center">
-                <CheckCircle className="w-6 h-6 text-pink-400 mx-auto mb-2" />
-                <p className="text-gray-300 text-sm">Branding & social content design</p>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-4 text-lg"
-                onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })}
-              >
-                Start Your Project
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900 px-8 py-4 text-lg"
-                onClick={() => document.getElementById('examples').scrollIntoView({ behavior: 'smooth' })}
-              >
-                View Examples
-              </Button>
+              <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                Pat Church
+              </span>
             </div>
             
-            {/* Quick Social Media Access */}
-            <div className="mt-8 text-center">
-              <p className="text-gray-400 text-sm mb-4">Follow PJC Web Designs:</p>
-              <div className="flex justify-center space-x-4">
-                {['facebook', 'instagram', 'twitter', 'linkedin'].map((platform) => (
-                  <Button
-                    key={platform}
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 rounded-full text-gray-400 hover:text-cyan-400 transition-colors"
-                    onClick={() => openSocialPlatform(platform)}
-                    title={`Follow us on ${platform.charAt(0).toUpperCase() + platform.slice(1)}`}
-                  >
-                    {getSocialIcon(platform)}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            
-            {/* Trust info */}
-            <div className="mt-8 text-center">
-              <p className="text-gray-500 text-sm">
-                Trusted by startups and growing businesses ✨
-              </p>
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#about" className="text-gray-300 hover:text-cyan-400 transition-colors">About</a>
+              <a href="#services" className="text-gray-300 hover:text-cyan-400 transition-colors">Services</a>
+              <a href="#work" className="text-gray-300 hover:text-cyan-400 transition-colors">Work</a>
+              <a href="#blog" className="text-gray-300 hover:text-cyan-400 transition-colors">Blog</a>
+              <a href="#contact">
+                <Button className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700">
+                  Let's Talk
+                </Button>
+              </a>
             </div>
           </div>
         </div>
-        
-        {/* Hero Image */}
-        <div className="relative max-w-6xl mx-auto px-4 pb-20">
-          <div className="rounded-2xl overflow-hidden shadow-2xl">
-            <img 
-              src="https://images.unsplash.com/photo-1707226845968-c7e5e3409e35" 
-              alt="Modern urban tech architecture representing innovative web design solutions for startups"
-              className="w-full h-96 object-cover"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+      </nav>
+
+      {/* Hero Section */}
+      <header className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+        {/* Animated background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-cyan-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Badge className="mb-6 bg-cyan-600/20 text-cyan-400 border-cyan-500/30">
+            <Sparkles className="w-3 h-3 mr-1" />
+            Kansas City, MO • Available for Projects
+          </Badge>
+          
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-6 leading-tight">
+            I Build Websites That
+            <span className="block bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Actually Make Money
+            </span>
+          </h1>
+          
+          <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+            Hey, I'm <span className="text-cyan-400 font-semibold">Patrick "Pat" James Church</span>. 
+            I combine AI, automation, and strategic web design to help small businesses 
+            get more leads, close more sales, and save hours every week.
+          </p>
+
+          {/* Value props */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-10">
+            {[
+              { icon: <Bot className="w-5 h-5" />, text: "AI Integration" },
+              { icon: <Zap className="w-5 h-5" />, text: "Automation" },
+              { icon: <TrendingUp className="w-5 h-5" />, text: "Lead Generation" },
+              { icon: <Globe className="w-5 h-5" />, text: "Web Design" }
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-center justify-center space-x-2 bg-slate-800/50 rounded-lg p-3 border border-slate-700">
+                <span className="text-cyan-400">{item.icon}</span>
+                <span className="text-gray-300 text-sm">{item.text}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#contact">
+              <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white px-8 py-6 text-lg">
+                Start Your Project
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </a>
+            <a href="#work">
+              <Button size="lg" variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 px-8 py-6 text-lg">
+                See My Work
+              </Button>
+            </a>
+          </div>
+
+          {/* Social proof */}
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-gray-400">
+            <div className="flex items-center space-x-2">
+              <div className="flex -space-x-2">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 border-2 border-slate-900"></div>
+                ))}
+              </div>
+              <span>Trusted by <span className="text-cyan-400">50+</span> businesses</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              {[1,2,3,4,5].map(i => (
+                <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              ))}
+              <span className="ml-2">5.0 rating</span>
+            </div>
           </div>
         </div>
       </header>
 
-      <main>
-        {/* Services Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" id="pricing">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Transparent Page-Based Pricing
-          </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-4">
-            Professional websites that grow with your business. Clear pricing based on the number of pages you need.
-          </p>
-          <div className="bg-slate-800/50 rounded-lg p-4 max-w-2xl mx-auto border border-cyan-400/30">
-            <p className="text-cyan-400 font-semibold mb-2">💡 How Pricing Works:</p>
-            <p className="text-gray-300 text-sm">
-              Each package includes a base number of pages. Need more? Simply add extra pages at our transparent per-page rates. 
-              <span className="text-cyan-400 font-medium"> Final total = Base price + (Extra pages × Per-page rate)</span>
-            </p>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <Card key={index} className={`relative overflow-hidden bg-slate-800/50 border-slate-700 hover:border-cyan-400 transition-all duration-300 ${service.popular ? 'scale-105 ring-2 ring-purple-400' : ''}`}>
-              {service.popular && (
-                <div className="absolute top-4 right-4">
-                  <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                    Most Popular
-                  </Badge>
-                </div>
-              )}
-              <CardHeader className="text-center pb-4">
-                <div className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-r ${service.color} flex items-center justify-center text-white mb-4`}>
-                  {service.icon}
-                </div>
-                <CardTitle className="text-2xl text-white mb-2">{service.name}</CardTitle>
-                <CardDescription className="text-3xl font-bold text-cyan-400 mb-2">{service.price}</CardDescription>
-                <div className="text-sm text-gray-400 italic">
-                  {service.priceNote}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6">
-                  {service.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center text-gray-300">
-                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Button 
-                  className={`w-full bg-gradient-to-r ${service.color} hover:opacity-90 text-white`}
-                  onClick={() => initiatePayment(service.id)}
-                >
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Purchase Now
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        
-        {/* Strategic Tools Section */}
-        <div className="mt-16 p-6 bg-gradient-to-r from-slate-800/30 to-slate-700/30 rounded-2xl border border-slate-600">
-          <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold text-white mb-2">Power Your Projects</h3>
-            <p className="text-gray-400">Professional tools we use and recommend for web designers</p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="flex items-center p-4 bg-slate-700/50 rounded-lg hover:bg-slate-700/70 transition-colors">
-              <Shield className="w-8 h-8 text-cyan-400 mr-4" />
-              <div className="flex-1">
-                <h4 className="text-white font-semibold">Data Protection</h4>
-                <p className="text-gray-400 text-sm">Secure your creative work</p>
-              </div>
-              <a 
-                href="https://www.jdoqocy.com/click-101532092-17143106" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-cyan-400 hover:text-cyan-300 font-medium"
-              >
-                AOMEI →
-              </a>
-              <img src="https://www.tqlkg.com/image-101532092-17143106" width="1" height="1" style={{border: 0, position: 'absolute', left: '-9999px'}} alt="" />
-            </div>
-            
-            <div className="flex items-center p-4 bg-slate-700/50 rounded-lg hover:bg-slate-700/70 transition-colors">
-              <Users className="w-8 h-8 text-purple-400 mr-4" />
-              <div className="flex-1">
-                <h4 className="text-white font-semibold">Designer Essentials</h4>
-                <p className="text-gray-400 text-sm">Professional eyewear for long work sessions</p>
-              </div>
-              <a 
-                href="https://www.dpbolvw.net/click-101532092-17140624" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-purple-400 hover:text-purple-300 font-medium"
-              >
-                Cool Frames →
-              </a>
-              <img src="https://www.ftjcfx.com/image-101532092-17140624" width="1" height="1" style={{border: 0, position: 'absolute', left: '-9999px'}} alt="" />
-            </div>
-          </div>
-          
-          {/* Large banner image affiliate */}
-          <div className="mt-6 text-center">
-            <a href="https://www.kqzyfj.com/click-101532092-17137571" target="_blank" rel="noopener noreferrer">
-              <img 
-                src="https://www.ftjcfx.com/image-101532092-17137571" 
-                alt="Professional Tools Banner" 
-                className="mx-auto rounded-lg opacity-80 hover:opacity-100 transition-opacity"
-                style={{maxWidth: '100%', height: 'auto', maxHeight: '200px'}}
-              />
-            </a>
-          </div>
-        </div>
-        </section>
-
-        {/* Landing Page Examples Section */}
-        <section className="bg-slate-800/30 py-20" id="examples">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Landing Page Examples by Tier
+      {/* About Section */}
+      <section id="about" className="py-20 bg-slate-800/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <Badge className="mb-4 bg-purple-600/20 text-purple-400 border-purple-500/30">
+                About Me
+              </Badge>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+                Not Your Typical Web Designer
               </h2>
-              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-                See exactly what you'll get with each package. Real landing page examples showcasing different business themes and complexity levels.
-              </p>
+              <div className="space-y-4 text-gray-300">
+                <p>
+                  I'm Pat Church, and I do things differently. While most web designers just make things look pretty, 
+                  <span className="text-cyan-400 font-medium"> I build digital systems that actually work for your business</span>.
+                </p>
+                <p>
+                  Based in Kansas City, I've spent years mastering the intersection of 
+                  <span className="text-purple-400 font-medium"> AI, automation, and web development</span>. 
+                  This unique combination means your website doesn't just sit there—it actively 
+                  generates leads, nurtures customers, and helps you close deals.
+                </p>
+                <p>
+                  Whether you need a simple landing page or a full AI-powered business system, 
+                  I'm here to help you leverage technology to grow your business.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 mt-8">
+                <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                  <div className="text-3xl font-bold text-cyan-400">50+</div>
+                  <div className="text-sm text-gray-400">Projects Delivered</div>
+                </div>
+                <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                  <div className="text-3xl font-bold text-purple-400">150%</div>
+                  <div className="text-sm text-gray-400">Avg Lead Increase</div>
+                </div>
+                <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                  <div className="text-3xl font-bold text-pink-400">5.0</div>
+                  <div className="text-sm text-gray-400">Client Rating</div>
+                </div>
+              </div>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Startup Launch Example */}
-              <Card className="bg-slate-700/50 border-slate-600 hover:border-green-400 transition-all duration-300 group overflow-hidden">
-                <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-4 text-center">
-                  <Rocket className="w-8 h-8 mx-auto text-white mb-2" />
-                  <h3 className="text-xl font-bold text-white">Startup Launch - $325</h3>
-                  <p className="text-green-100 text-sm">3-Page Coffee Shop Landing</p>
-                </div>
-                
-                <div className="relative overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb" 
-                    alt="Coffee shop landing page example - clean, minimal design with hero section, menu preview, and contact"
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h4 className="text-white font-semibold mb-1">Brew Haven Coffee</h4>
-                    <p className="text-gray-300 text-xs">Clean, minimal design perfect for local businesses</p>
-                  </div>
-                </div>
-
-                <CardContent className="p-6">
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                      Hero section with compelling headline
+            {/* Skills Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              {skills.map((skill, idx) => (
+                <Card key={idx} className="bg-slate-800/50 border-slate-700 hover:border-cyan-500/50 transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="p-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-lg text-cyan-400">
+                        {skill.icon}
+                      </div>
+                      <h3 className="font-semibold text-white">{skill.category}</h3>
                     </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                      About page with story & values
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                      Contact page with map & hours
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                      Mobile-responsive design
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                      Contact form integration
-                    </div>
-                  </div>
-                  
-                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                    <p className="text-green-400 text-xs font-medium">Perfect for: Local businesses, cafes, consultants, service providers</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Business Growth Example */}
-              <Card className="bg-slate-700/50 border-slate-600 hover:border-cyan-400 transition-all duration-300 group overflow-hidden ring-2 ring-cyan-400/50">
-                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-4 text-center relative">
-                  <Badge className="absolute top-2 right-2 bg-yellow-500 text-black text-xs">
-                    Most Popular
-                  </Badge>
-                  <Globe className="w-8 h-8 mx-auto text-white mb-2" />
-                  <h3 className="text-xl font-bold text-white">Business Growth - $812</h3>
-                  <p className="text-cyan-100 text-sm">8-Page SaaS Product Landing</p>
-                </div>
-                
-                <div className="relative overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f" 
-                    alt="SaaS product landing page example - modern design with features, pricing, testimonials, and blog"
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h4 className="text-white font-semibold mb-1">TaskFlow Pro</h4>
-                    <p className="text-gray-300 text-xs">Feature-rich SaaS landing with advanced animations</p>
-                  </div>
-                </div>
-
-                <CardContent className="p-6">
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
-                      Advanced hero with product demo
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
-                      Features page with animations
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
-                      Pricing page with tiers
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
-                      Testimonials & case studies
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
-                      Blog integration with CMS
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-cyan-400 mr-2" />
-                      Analytics dashboard setup
-                    </div>
-                  </div>
-                  
-                  <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-3">
-                    <p className="text-cyan-400 text-xs font-medium">Perfect for: SaaS products, tech startups, digital agencies, online services</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Scale & Expand Example */}
-              <Card className="bg-slate-700/50 border-slate-600 hover:border-purple-400 transition-all duration-300 group overflow-hidden">
-                <div className="bg-gradient-to-r from-purple-400 to-pink-500 p-4 text-center">
-                  <Shield className="w-8 h-8 mx-auto text-white mb-2" />
-                  <h3 className="text-xl font-bold text-white">Scale & Expand - $1,625</h3>
-                  <p className="text-purple-100 text-sm">15-Page E-commerce Platform</p>
-                </div>
-                
-                <div className="relative overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d" 
-                    alt="E-commerce platform landing page example - sophisticated design with product catalogs, user accounts, and payment integration"
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h4 className="text-white font-semibold mb-1">UrbanStyle Marketplace</h4>
-                    <p className="text-gray-300 text-xs">Full-featured e-commerce with custom functionality</p>
-                  </div>
-                </div>
-
-                <CardContent className="p-6">
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
-                      Advanced product catalog system
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
-                      User accounts & profiles
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
-                      Shopping cart & checkout
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
-                      Payment gateway integration
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
-                      Admin dashboard & CMS
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
-                      Advanced SEO & performance
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-purple-400 mr-2" />
-                      Custom integrations & APIs
-                    </div>
-                  </div>
-                  
-                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
-                    <p className="text-purple-400 text-xs font-medium">Perfect for: E-commerce stores, marketplaces, large businesses, complex web apps</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="text-center mt-12">
-              <Button 
-                className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900"
-                onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })}
-              >
-                Choose Your Package
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
+                    <ul className="space-y-2">
+                      {skill.items.map((item, i) => (
+                        <li key={i} className="flex items-center text-sm text-gray-400">
+                          <CheckCircle className="w-3 h-3 mr-2 text-cyan-400" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Portfolio Section */}
-        <section className="bg-slate-800/30 py-20" id="portfolio">
+      {/* Services Section */}
+      <section id="services" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Digital Masterpieces
+            <Badge className="mb-4 bg-cyan-600/20 text-cyan-400 border-cyan-500/30">
+              Services & Pricing
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Packages Built for Growth
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Explore our latest creations where urban design meets technological innovation.
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+              Every package includes AI integration, because in 2025, that's not optional—it's essential.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {portfolioItems.map((item, index) => (
-              <Card key={index} className="bg-slate-800/50 border-slate-700 hover:border-cyan-400 transition-all duration-300 group overflow-hidden">
+            {services.map((service, index) => (
+              <Card 
+                key={index} 
+                className={`relative bg-slate-800/50 border-slate-700 hover:border-cyan-500/50 transition-all duration-300 overflow-hidden ${service.popular ? 'ring-2 ring-cyan-500' : ''}`}
+              >
+                {service.popular && (
+                  <div className="absolute top-4 right-4">
+                    <Badge className="bg-cyan-500 text-white">Most Popular</Badge>
+                  </div>
+                )}
+                <CardHeader>
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${service.color} flex items-center justify-center text-white mb-4`}>
+                    {service.icon}
+                  </div>
+                  <CardTitle className="text-2xl text-white">{service.name}</CardTitle>
+                  <div className="mt-2">
+                    <span className="text-3xl font-bold text-white">{service.price}</span>
+                    <p className="text-sm text-gray-400 mt-1">{service.priceNote}</p>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3 mb-6">
+                    {service.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start text-gray-300">
+                        <CheckCircle className="w-5 h-5 text-cyan-400 mr-3 flex-shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button 
+                    className={`w-full ${service.popular ? 'bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700' : 'bg-slate-700 hover:bg-slate-600'} text-white`}
+                    onClick={() => initiatePayment(service.id)}
+                  >
+                    Get Started
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-gray-400 mb-4">
+              Need something custom? Let's talk about your specific needs.
+            </p>
+            <a href="#contact">
+              <Button variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
+                Request Custom Quote
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Portfolio/Work Section */}
+      <section id="work" className="py-20 bg-slate-800/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-purple-600/20 text-purple-400 border-purple-500/30">
+              Featured Work
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Real Results for Real Businesses
+            </h2>
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+              Every project is built to deliver measurable outcomes—not just pretty designs.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {projects.map((project, index) => (
+              <Card key={index} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden group">
                 <div className="relative overflow-hidden">
                   <img 
-                    src={item.image} 
-                    alt={`${item.title} - Professional web design project showcasing ${item.tech.join(', ')} technologies`}
+                    src={project.image} 
+                    alt={project.title}
                     className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute top-4 right-4">
+                    <Badge className="bg-green-500/90 text-white">{project.result}</Badge>
+                  </div>
                 </div>
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-gray-400 mb-4">{item.description}</p>
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                    {project.title}
+                  </h3>
+                  <p className="text-gray-400 mb-4">{project.description}</p>
                   <div className="flex flex-wrap gap-2">
-                    {item.tech.map((tech, idx) => (
-                      <Badge key={idx} variant="secondary" className="bg-slate-700 text-cyan-400">
-                        {tech}
+                    {project.tags.map((tag, idx) => (
+                      <Badge key={idx} variant="secondary" className="bg-slate-700 text-gray-300">
+                        {tag}
                       </Badge>
                     ))}
                   </div>
@@ -1088,140 +831,110 @@ function App() {
             ))}
           </div>
         </div>
-        </section>
+      </section>
 
-        {/* Affiliate Partners Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" id="partners">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Partner Network
-          </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Join our affiliate program and earn commissions by referring clients to our premium web design services.
-          </p>
-        </div>
+      {/* Testimonials Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-pink-600/20 text-pink-400 border-pink-500/30">
+              Client Success Stories
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              What My Clients Say
+            </h2>
+          </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {affiliatePartners.map((partner, index) => (
-            <Card key={index} className="bg-slate-800/50 border-slate-700 hover:border-cyan-400 transition-all duration-300">
-              <CardContent className="p-6 text-center">
-                <Badge className="mb-3 bg-cyan-600/20 text-cyan-400">{partner.category}</Badge>
-                <h3 className="text-lg font-semibold text-white mb-2">{partner.name}</h3>
-                <p className="text-gray-400 mb-4 text-sm">{partner.description}</p>
-                <p className="text-gray-500 mb-4 text-xs">Clicks: {partner.clicks}</p>
-                <Button 
-                  variant="outline" 
-                  className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900"
-                  onClick={() => window.open(partner.link, '_blank')}
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Visit Partner
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        </section>
-
-        {/* Blog Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" id="blog">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Latest Insights
-          </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Stay updated with the latest trends in web design, development, and digital innovation.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {blogPosts.map((post, index) => (
-            <Card key={index} className="bg-slate-800/50 border-slate-700 hover:border-cyan-400 transition-all duration-300 group overflow-hidden">
-              <div className="relative overflow-hidden">
-                <img 
-                  src={post.featured_image} 
-                  alt={`${post.title} - ${post.excerpt.substring(0, 100)}...`}
-                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                  loading="lazy"
-                />
-                <div className="absolute top-4 left-4">
-                  <Badge className="bg-cyan-600 text-white">
-                    {post.category}
-                  </Badge>
-                </div>
-              </div>
-              <CardContent className="p-6">
-                <div className="flex items-center text-gray-400 text-sm mb-3 space-x-4">
-                  <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    {new Date(post.timestamp).toLocaleDateString()}
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-1" />
-                    {post.reading_time} min read
-                  </div>
-                </div>
-                
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
-                  {post.title}
-                </h3>
-                
-                <p className="text-gray-400 mb-4 line-clamp-3">
-                  {post.excerpt}
-                </p>
-                
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {post.tags.slice(0, 3).map((tag, idx) => (
-                    <Badge key={idx} variant="secondary" className="bg-slate-700 text-gray-300">
-                      <Tag className="w-3 h-3 mr-1" />
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center text-gray-400">
-                    <User className="w-4 h-4 mr-2" />
-                    <span className="text-sm">{post.author}</span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    {socialPlatforms.slice(0, 4).map((platform) => (
-                      <Button
-                        key={platform.id}
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-gray-400 hover:text-cyan-400"
-                        onClick={() => handleSocialShare(platform.id, post.slug)}
-                        title={`Share on ${platform.name}`}
-                      >
-                        {getSocialIcon(platform.id)}
-                      </Button>
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-1 mb-4">
+                    {[1,2,3,4,5].map(i => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  <p className="text-gray-300 mb-6 italic">"{testimonial.quote}"</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-white">{testimonial.name}</p>
+                      <p className="text-sm text-gray-400">{testimonial.business}</p>
+                    </div>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                      {testimonial.result}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
+      </section>
 
-        <div className="text-center mt-12">
-          <Button variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-slate-900">
-            View All Articles
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
-        </div>
+      {/* Blog Section */}
+      {blogPosts.length > 0 && (
+        <section id="blog" className="py-20 bg-slate-800/30">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <Badge className="mb-4 bg-cyan-600/20 text-cyan-400 border-cyan-500/30">
+                Latest Insights
+              </Badge>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                From the Blog
+              </h2>
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                Thoughts on AI, automation, web design, and building profitable online businesses.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {blogPosts.map((post, index) => (
+                <Card key={index} className="bg-slate-800/50 border-slate-700 hover:border-cyan-500/50 transition-all duration-300 overflow-hidden group">
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={post.featured_image} 
+                      alt={post.title}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <Badge className="bg-cyan-600 text-white">{post.category}</Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="flex items-center text-gray-400 text-sm mb-3 space-x-4">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {new Date(post.timestamp).toLocaleDateString()}
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        {post.reading_time} min read
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-gray-400 line-clamp-2">{post.excerpt}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </section>
+      )}
 
-        {/* Contact Section */}
-        <section className="bg-slate-800/30 py-20" id="contact">
+      {/* Contact Section */}
+      <section id="contact" className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-6">
-              Let's Launch Your Business Online
+          <div className="text-center mb-12">
+            <Badge className="mb-4 bg-purple-600/20 text-purple-400 border-purple-500/30">
+              Let's Connect
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Ready to Grow Your Business?
             </h2>
-            <p className="text-xl text-gray-400">
-              Ready to establish your online presence? Let's discuss your startup's digital needs and growth goals.
+            <p className="text-lg text-gray-400">
+              Tell me about your project and I'll get back to you within 24 hours.
             </p>
           </div>
 
@@ -1265,10 +978,11 @@ function App() {
                         <SelectValue placeholder="Select Service" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="essential">Essential Web Presence</SelectItem>
-                        <SelectItem value="professional">Professional Business Suite</SelectItem>
-                        <SelectItem value="enterprise">Enterprise Digital Ecosystem</SelectItem>
-                        <SelectItem value="custom">Custom Solution</SelectItem>
+                        <SelectItem value="launch-pad">Launch Pad ($325+)</SelectItem>
+                        <SelectItem value="growth-engine">Growth Engine ($812+)</SelectItem>
+                        <SelectItem value="scale-dominate">Scale & Dominate ($1,625+)</SelectItem>
+                        <SelectItem value="custom">Custom Project</SelectItem>
+                        <SelectItem value="consultation">Free Consultation</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1276,7 +990,7 @@ function App() {
 
                 <div>
                   <Textarea
-                    placeholder="Tell us about your project..."
+                    placeholder="Tell me about your project... What's your biggest business challenge right now?"
                     value={contactForm.message}
                     onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
                     className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 min-h-[120px]"
@@ -1284,42 +998,63 @@ function App() {
                   />
                 </div>
 
-                <Button type="submit" size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white">
+                <Button type="submit" size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white">
                   Send Message
                   <Send className="ml-2 w-5 h-5" />
                 </Button>
               </form>
+
+              {/* Contact Info */}
+              <div className="mt-8 pt-8 border-t border-slate-700">
+                <div className="grid md:grid-cols-3 gap-6 text-center">
+                  <div className="flex flex-col items-center">
+                    <Mail className="w-6 h-6 text-cyan-400 mb-2" />
+                    <a href="mailto:Patrickjchurch04@gmail.com" className="text-gray-300 hover:text-cyan-400 transition-colors text-sm">
+                      Patrickjchurch04@gmail.com
+                    </a>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <MapPin className="w-6 h-6 text-purple-400 mb-2" />
+                    <span className="text-gray-300 text-sm">Kansas City, MO</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <Clock className="w-6 h-6 text-pink-400 mb-2" />
+                    <span className="text-gray-300 text-sm">Response within 24hrs</span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
-        </section>
-      </main>
-
-
+      </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 py-12">
+      <footer className="bg-slate-900 py-12 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-2">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                PJC Web Designs
-              </h3>
-              <p className="text-gray-400 mb-6">
-                Empowering startups and growing businesses with affordable, professional websites. 
-                We believe every entrepreneur deserves a stunning online presence, regardless of budget.
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">P</span>
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  Pat Church
+                </span>
+              </div>
+              <p className="text-gray-400 mb-6 max-w-md">
+                AI-powered web design & automation for small businesses that want to grow. 
+                Based in Kansas City, serving clients nationwide.
               </p>
               <div className="flex space-x-4">
-                {socialPlatforms.slice(0, 6).map((platform) => (
+                {['facebook', 'twitter', 'linkedin', 'instagram'].map((platform) => (
                   <Button
-                    key={platform.id}
+                    key={platform}
                     variant="ghost"
                     size="sm"
                     className="h-10 w-10 p-0 rounded-full border border-slate-700 hover:border-cyan-400 text-gray-400 hover:text-cyan-400"
-                    onClick={() => openSocialPlatform(platform.id)}
-                    title={`Follow PJC Web Designs on ${platform.name}`}
+                    onClick={() => openSocialPlatform(platform)}
                   >
-                    {getSocialIcon(platform.id)}
+                    {getSocialIcon(platform)}
                   </Button>
                 ))}
               </div>
@@ -1327,110 +1062,31 @@ function App() {
             
             <div>
               <h4 className="text-lg font-semibold text-white mb-4">Services</h4>
-              <ul className="space-y-2">
-                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Web Design</Button></li>
-                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Development</Button></li>
-                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">E-commerce</Button></li>
-                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">SEO</Button></li>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#services" className="hover:text-cyan-400 transition-colors">AI Integration</a></li>
+                <li><a href="#services" className="hover:text-cyan-400 transition-colors">Web Design</a></li>
+                <li><a href="#services" className="hover:text-cyan-400 transition-colors">Automation</a></li>
+                <li><a href="#services" className="hover:text-cyan-400 transition-colors">Lead Generation</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Contact</h4>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-gray-400 text-sm mb-1">Email us directly:</p>
-                  <a 
-                    href="mailto:Patrickjchurch04@gmail.com" 
-                    className="text-cyan-400 hover:text-cyan-300 transition-colors text-sm break-all"
-                  >
-                    Patrickjchurch04@gmail.com
-                  </a>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm mb-2">
-                    Response time: 24 hours
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm mb-2">Social Media:</p>
-                  <div className="flex space-x-2">
-                    {['facebook', 'twitter', 'instagram', 'linkedin'].map((platform) => (
-                      <Button
-                        key={platform}
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0 text-gray-400 hover:text-cyan-400"
-                        onClick={() => openSocialPlatform(platform)}
-                        title={platform.charAt(0).toUpperCase() + platform.slice(1)}
-                      >
-                        {getSocialIcon(platform)}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2">
-                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">About</Button></li>
-                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Blog</Button></li>
-                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Careers</Button></li>
-                <li><Button variant="ghost" className="text-gray-400 hover:text-cyan-400 p-0 h-auto">Contact</Button></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Recommended Tools</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a 
-                    href="https://www.jdoqocy.com/click-101532092-17143106" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-cyan-400 text-sm transition-colors"
-                  >
-                    AOMEI - Data Backup
-                  </a>
-                  <img src="https://www.tqlkg.com/image-101532092-17143106" width="1" height="1" style={{border: 0, display: 'none'}} alt="" />
-                </li>
-                <li>
-                  <a 
-                    href="https://www.dpbolvw.net/click-101532092-17140624" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-cyan-400 text-sm transition-colors"
-                  >
-                    Cool Frames - Designer Eyewear
-                  </a>
-                  <img src="https://www.ftjcfx.com/image-101532092-17140624" width="1" height="1" style={{border: 0, display: 'none'}} alt="" />
-                </li>
-                <li>
-                  <a 
-                    href="https://www.kqzyfj.com/click-101532092-17146866" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-cyan-400 text-sm transition-colors"
-                  >
-                    Professional Resources
-                  </a>
-                  <img src="https://www.tqlkg.com/image-101532092-17146866" width="1" height="1" style={{border: 0, display: 'none'}} alt="" />
-                </li>
+              <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#about" className="hover:text-cyan-400 transition-colors">About</a></li>
+                <li><a href="#work" className="hover:text-cyan-400 transition-colors">Portfolio</a></li>
+                <li><a href="#blog" className="hover:text-cyan-400 transition-colors">Blog</a></li>
+                <li><a href="#contact" className="hover:text-cyan-400 transition-colors">Contact</a></li>
               </ul>
             </div>
           </div>
           
           <div className="border-t border-slate-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-500 mb-4 md:mb-0">
-                © 2025 PJC Web Designs. All rights reserved.
-              </p>
-              <div className="flex space-x-6">
-                <Button variant="ghost" className="text-gray-400 hover:text-cyan-400">Privacy Policy</Button>
-                <Button variant="ghost" className="text-gray-400 hover:text-cyan-400">Terms of Service</Button>
-                <Button variant="ghost" className="text-gray-400 hover:text-cyan-400">Cookie Policy</Button>
+            <div className="flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+              <p>© 2025 Patrick James Church. All rights reserved.</p>
+              <div className="flex space-x-6 mt-4 md:mt-0">
+                <span>Privacy Policy</span>
+                <span>Terms of Service</span>
               </div>
             </div>
           </div>
@@ -1442,7 +1098,7 @@ function App() {
         {!isChatOpen && (
           <Button
             onClick={() => setIsChatOpen(true)}
-            className="rounded-full w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-lg"
+            className="rounded-full w-16 h-16 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 shadow-lg shadow-cyan-500/25"
           >
             <MessageCircle className="w-6 h-6" />
           </Button>
@@ -1450,11 +1106,11 @@ function App() {
 
         {isChatOpen && (
           <Card className="w-80 h-96 bg-slate-800 border-slate-700 shadow-2xl">
-            <CardHeader className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-4">
+            <CardHeader className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white p-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle className="text-lg">PJC Assistant</CardTitle>
-                  <CardDescription className="text-cyan-100">How can I help you today?</CardDescription>
+                  <CardTitle className="text-lg">Chat with Pat</CardTitle>
+                  <CardDescription className="text-cyan-100">AI Assistant • Usually replies instantly</CardDescription>
                 </div>
                 <Button
                   variant="ghost"
@@ -1471,7 +1127,7 @@ function App() {
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {chatMessages.length === 0 && (
                   <div className="text-gray-400 text-sm">
-                    Hi! I'm here to help you learn about our web design services. Ask me anything!
+                    Hey! 👋 I'm Pat's AI assistant. Ask me anything about services, pricing, or how I can help grow your business!
                   </div>
                 )}
                 
@@ -1482,26 +1138,22 @@ function App() {
                         ? 'bg-cyan-600 text-white' 
                         : 'bg-slate-700 text-gray-200'
                     }`}>
-                      <p className="text-sm">{msg.content}</p>
+                      {msg.content}
                     </div>
                   </div>
                 ))}
                 
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-slate-700 text-gray-200 p-3 rounded-lg">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                      </div>
+                    <div className="bg-slate-700 p-3 rounded-lg">
+                      <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
                     </div>
                   </div>
                 )}
                 <div ref={chatEndRef} />
               </div>
               
-              <div className="p-4 border-t border-slate-700">
+              <div className="border-t border-slate-700 p-4">
                 <div className="flex space-x-2">
                   <Input
                     placeholder="Type your message..."
@@ -1509,12 +1161,11 @@ function App() {
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleChatSend()}
                     className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400"
-                    disabled={isLoading}
                   />
-                  <Button
-                    onClick={handleChatSend}
-                    disabled={isLoading || !chatInput.trim()}
-                    className="bg-cyan-600 hover:bg-cyan-700"
+                  <Button 
+                    onClick={handleChatSend} 
+                    className="bg-gradient-to-r from-cyan-500 to-purple-600"
+                    disabled={isLoading}
                   >
                     <Send className="w-4 h-4" />
                   </Button>
