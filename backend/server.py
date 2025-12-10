@@ -1378,16 +1378,16 @@ Allow: /api/robots.txt
 async def get_seo_meta():
     """Get SEO metadata for dynamic pages"""
     return {
-        "title": "PJC Web Designs - Affordable Website Design for Startups",
-        "description": "Professional website design for startups and growing businesses. Modern, mobile-responsive websites starting at just $199.",
-        "keywords": "web design, startup websites, affordable web design, mobile responsive design, SEO optimization, small business websites",
+        "title": "Pat Church - AI-Powered Web Design & Automation | Kansas City",
+        "description": "I'm Pat Church, and I build websites that actually make money. AI integration, automation, and strategic web design for small businesses in Kansas City and beyond.",
+        "keywords": "AI web design, automation, lead generation, Kansas City web designer, small business websites, AI chatbots, custom automation",
         "canonical": "https://patjc-digital.preview.emergentagent.com",
-        "og_image": "https://images.unsplash.com/photo-1707226845968-c7e5e3409e35",
+        "og_image": "https://images.unsplash.com/photo-1559028012-481c04fa702d",
         "structured_data": {
             "@context": "https://schema.org",
-            "@type": "WebDesignCompany",
-            "name": "PJC Web Designs",
-            "priceRange": "$199-$999"
+            "@type": "ProfessionalService",
+            "name": "Pat Church - Web Design & AI Automation",
+            "priceRange": "$325-$1625+"
         }
     }
 
