@@ -310,16 +310,29 @@ def get_paypal_client():
     environment = SandboxEnvironment(client_id=client_id, client_secret=client_secret)
     return environment.client()
 
-def calculate_package_price(package_id: str, total_pages: int) -> Dict:
+def calculate_package_price(package_id: str, total_pages: int = 0) -> Dict:
     """Calculate the final price based on package and number of pages"""
     if package_id not in PACKAGES:
         raise HTTPException(status_code=400, detail="Invalid package selected")
     
     package = PACKAGES[package_id]
     base_price = package["base_price"]
-    included_pages = package["included_pages"]
-    additional_page_price = package["additional_page_price"]
-    max_pages = package["max_pages"]
+    service_type = package.get("service_type", "web_design")
+    
+    # For transport/moving packages, just return base price
+    if service_type in ["moving", "transport"]:
+        return {
+            "base_price": base_price,
+            "final_price": base_price,
+            "service_type": service_type,
+            "name": package.get("name", package_id),
+            "description": package.get("description", "")
+        }
+    
+    # For web design packages with page-based pricing
+    included_pages = package.get("included_pages", 0)
+    additional_page_price = package.get("additional_page_price", 0)
+    max_pages = package.get("max_pages", 50)
     
     # Use included pages if total_pages is 0 or less than included
     if total_pages <= 0:
