@@ -225,19 +225,57 @@ PACKAGES = {
         "base_price": 325.00,
         "included_pages": 3,
         "additional_page_price": 106.00,
-        "max_pages": 10
+        "max_pages": 10,
+        "name": "Launch Pad",
+        "service_type": "web_design"
     },
     "growth": {
         "base_price": 812.00,
         "included_pages": 8,
         "additional_page_price": 100.00,
-        "max_pages": 20
+        "max_pages": 20,
+        "name": "Growth Engine",
+        "service_type": "web_design"
     },
     "scale": {
         "base_price": 1625.00,
         "included_pages": 15,
         "additional_page_price": 94.00,
-        "max_pages": 50
+        "max_pages": 50,
+        "name": "Scale & Dominate",
+        "service_type": "web_design"
+    },
+    # NewReach Transport - Moving Services (deposit/booking fee)
+    "move_local_basic": {
+        "base_price": 99.00,
+        "name": "Local Move - Basic (2hr deposit)",
+        "service_type": "moving",
+        "description": "2-hour minimum booking deposit for local basic move"
+    },
+    "move_local_full": {
+        "base_price": 149.00,
+        "name": "Local Move - Full Service (2hr deposit)",
+        "service_type": "moving",
+        "description": "2-hour minimum booking deposit for full service local move"
+    },
+    "move_long_distance": {
+        "base_price": 500.00,
+        "name": "Long Distance Move (Booking Deposit)",
+        "service_type": "moving",
+        "description": "Booking deposit for long distance move - final price based on weight/distance"
+    },
+    # Box Truck Services
+    "box_truck_local": {
+        "base_price": 150.00,
+        "name": "Box Truck - Local Haul (Booking Fee)",
+        "service_type": "transport",
+        "description": "Booking fee for local box truck service"
+    },
+    "box_truck_regional": {
+        "base_price": 250.00,
+        "name": "Box Truck - Regional Haul (Booking Fee)",
+        "service_type": "transport",
+        "description": "Booking fee for regional box truck service"
     }
 }
 
