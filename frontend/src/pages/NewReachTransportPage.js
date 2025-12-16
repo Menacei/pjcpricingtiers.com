@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import axios from 'axios';
 import {
   Truck,
@@ -20,7 +21,10 @@ import {
   DollarSign,
   Home,
   Building,
-  Route
+  Route,
+  X,
+  CreditCard,
+  Loader2
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -37,6 +41,12 @@ const NewReachTransportPage = () => {
     move_date: '',
     details: ''
   });
+
+  // Payment state
+  const [paymentLoading, setPaymentLoading] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState(null);
 
   const handleQuoteSubmit = async (e) => {
     e.preventDefault();
@@ -59,29 +69,83 @@ const NewReachTransportPage = () => {
     }
   };
 
-  // Box truck services
-  const boxTruckServices = [
-    {
-      title: "Local Box Truck Jobs",
-      rate: "$1.90 - $2.60/mile",
-      description: "Competitive rates for local deliveries and hauls in the Kansas City metro area.",
-      features: ["Same-day availability", "Professional handling", "Flexible scheduling", "Insured loads"]
-    },
-    {
-      title: "Regional Hauls",
-      rate: "$1.90 - $2.60/mile",
-      description: "Box truck services throughout Missouri, Kansas, and surrounding states.",
-      features: ["Route optimization", "Reliable delivery windows", "Load tracking", "Competitive pricing"]
-    }
-  ];
+  // Payment functions
+  const initiatePayment = (pkg) => {
+    setSelectedPackage(pkg);
+    setShowPaymentModal(true);
+  };
 
-  // Moving tiers - Kansas City averages are $130-180/hr for 2 movers
-  // Offering below average: ~$100/hr for local moves
+  const processStripePayment = async (packageId) => {
+    setPaymentLoading(`stripe-${packageId}`);
+    
+    try {
+      const originUrl = window.location.origin;
+      const requestBody = {
+        package_id: packageId,
+        origin_url: originUrl,
+        payment_method: "stripe"
+      };
+
+      const response = await axios.post(`${API}/checkout/session`, requestBody);
+      
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Stripe payment error:', error);
+      alert('Failed to initiate payment. Please try again or contact me directly.');
+      setPaymentLoading("");
+    }
+  };
+
+  const createPayPalOrder = async (packageId) => {
+    try {
+      const originUrl = window.location.origin;
+      const requestBody = {
+        package_id: packageId,
+        origin_url: originUrl
+      };
+
+      const response = await axios.post(`${API}/paypal/orders`, requestBody);
+      return response.data.order_id;
+    } catch (error) {
+      console.error('PayPal order creation error:', error);
+      throw error;
+    }
+  };
+
+  const capturePayPalOrder = async (orderId) => {
+    try {
+      const response = await axios.post(`${API}/paypal/orders/${orderId}/capture`);
+      
+      if (response.data.status === "COMPLETED") {
+        setPaymentStatus({
+          type: 'success',
+          message: 'Payment successful! I\'ll contact you within 24 hours to schedule your service.'
+        });
+        setShowPaymentModal(false);
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('PayPal capture error:', error);
+      setPaymentStatus({
+        type: 'error',
+        message: 'PayPal payment failed. Please try again.'
+      });
+      throw error;
+    }
+  };
+
+  // Moving tiers with payment integration
   const movingTiers = [
     {
-      id: "local-basic",
+      id: "move_local_basic",
       name: "Local Move - Basic",
       price: "$99/hour",
+      depositPrice: "$99",
       priceNote: "2-hour minimum • KC Metro Area",
       avgComparison: "KC Average: $130-180/hr",
       description: "Perfect for apartment moves and small homes within Kansas City",
@@ -97,9 +161,10 @@ const NewReachTransportPage = () => {
       savings: "Save ~$30-80/hr vs average"
     },
     {
-      id: "local-full",
+      id: "move_local_full",
       name: "Local Move - Full Service",
       price: "$149/hour",
+      depositPrice: "$149",
       priceNote: "2-hour minimum • KC Metro Area",
       avgComparison: "KC Average: $195-270/hr",
       description: "Complete moving solution for larger homes and offices",
@@ -117,9 +182,10 @@ const NewReachTransportPage = () => {
       savings: "Save ~$50-120/hr vs average"
     },
     {
-      id: "long-distance",
+      id: "move_long_distance",
       name: "Long Distance Move",
       price: "From $0.45/lb",
+      depositPrice: "$500",
       priceNote: "Based on weight & distance",
       avgComparison: "Industry Average: $0.50-0.80/lb",
       description: "Interstate and cross-country moves at competitive rates",
@@ -137,8 +203,122 @@ const NewReachTransportPage = () => {
     }
   ];
 
+  // Box truck services
+  const boxTruckServices = [
+    {
+      id: "box_truck_local",
+      title: "Local Box Truck Jobs",
+      rate: "$1.90 - $2.60/mile",
+      depositPrice: "$150",
+      description: "Competitive rates for local deliveries and hauls in the Kansas City metro area.",
+      features: ["Same-day availability", "Professional handling", "Flexible scheduling", "Insured loads"]
+    },
+    {
+      id: "box_truck_regional",
+      title: "Regional Hauls",
+      rate: "$1.90 - $2.60/mile",
+      depositPrice: "$250",
+      description: "Box truck services throughout Missouri, Kansas, and surrounding states.",
+      features: ["Route optimization", "Reliable delivery windows", "Load tracking", "Competitive pricing"]
+    }
+  ];
+
+  // Payment Status Display
+  const PaymentStatusDisplay = () => {
+    if (!paymentStatus) return null;
+
+    const statusStyles = {
+      success: "bg-green-500/20 border-green-500 text-green-300",
+      error: "bg-red-500/20 border-red-500 text-red-300",
+      pending: "bg-yellow-500/20 border-yellow-500 text-yellow-300"
+    };
+
+    return (
+      <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 p-4 rounded-lg border ${statusStyles[paymentStatus.type]} max-w-md w-full mx-4`}>
+        <div className="flex items-center space-x-2">
+          {paymentStatus.type === 'pending' && <Loader2 className="w-5 h-5 animate-spin" />}
+          {paymentStatus.type === 'success' && <CheckCircle className="w-5 h-5" />}
+          {paymentStatus.type === 'error' && <X className="w-5 h-5" />}
+          <p className="text-sm font-medium">{paymentStatus.message}</p>
+        </div>
+        {paymentStatus.type !== 'pending' && (
+          <button onClick={() => setPaymentStatus(null)} className="absolute top-2 right-2 text-current hover:opacity-70">
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  // Payment Modal
+  const PaymentModal = () => {
+    if (!showPaymentModal || !selectedPackage) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <Card className="bg-slate-800 border-slate-700 w-full max-w-md">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-white">Book Your Service</CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => setShowPaymentModal(false)} className="text-gray-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <CardDescription className="text-gray-300">
+              {selectedPackage.name || selectedPackage.title} - {selectedPackage.depositPrice} deposit
+            </CardDescription>
+            <p className="text-xs text-gray-400 mt-2">
+              This is a booking deposit. Final price will be calculated based on actual service.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+              onClick={() => processStripePayment(selectedPackage.id)}
+              disabled={paymentLoading === `stripe-${selectedPackage.id}`}
+            >
+              {paymentLoading === `stripe-${selectedPackage.id}` ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
+              ) : (
+                <><CreditCard className="w-4 h-4 mr-2" />Pay with Card (Stripe)</>
+              )}
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-slate-600" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-slate-800 px-2 text-gray-400">Or</span>
+              </div>
+            </div>
+
+            <PayPalScriptProvider options={{ "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID || "test", currency: "USD" }}>
+              <PayPalButtons
+                style={{ layout: "horizontal", height: 40 }}
+                createOrder={() => createPayPalOrder(selectedPackage.id)}
+                onApprove={(data) => capturePayPalOrder(data.orderID)}
+                onError={(err) => {
+                  console.error('PayPal error:', err);
+                  setPaymentStatus({ type: 'error', message: 'PayPal payment failed. Please try again or use card.' });
+                }}
+              />
+            </PayPalScriptProvider>
+
+            <p className="text-xs text-center text-gray-500">
+              Secure payments via Stripe & PayPal. Your deposit is applied to your final bill.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
   return (
     <div className="pt-16">
+      <PaymentStatusDisplay />
+      <PaymentModal />
+
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-b from-slate-900 via-orange-900/20 to-slate-900 overflow-hidden">
         <div className="absolute inset-0">
@@ -210,7 +390,7 @@ const NewReachTransportPage = () => {
                   <p className="text-gray-400 mt-2">{service.description}</p>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-2">
+                  <ul className="space-y-2 mb-6">
                     {service.features.map((feature, idx) => (
                       <li key={idx} className="flex items-center text-gray-300">
                         <CheckCircle className="w-4 h-4 text-orange-400 mr-3 flex-shrink-0" />
@@ -218,6 +398,13 @@ const NewReachTransportPage = () => {
                       </li>
                     ))}
                   </ul>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white"
+                    onClick={() => initiatePayment(service)}
+                  >
+                    Book Now ({service.depositPrice} deposit)
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -279,15 +466,27 @@ const NewReachTransportPage = () => {
                       </li>
                     ))}
                   </ul>
-                  <a href="#quote">
-                    <Button className={`w-full ${tier.popular ? 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700' : 'bg-slate-700 hover:bg-slate-600'} text-white`}>
-                      Get Quote
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </a>
+                  <Button 
+                    className={`w-full ${tier.popular ? 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700' : 'bg-slate-700 hover:bg-slate-600'} text-white`}
+                    onClick={() => initiatePayment(tier)}
+                  >
+                    Book Now ({tier.depositPrice} deposit)
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-gray-400 mb-4">
+              Deposits are applied to your final bill. Get a free quote for exact pricing.
+            </p>
+            <a href="#quote">
+              <Button variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
+                Get Free Quote Instead
+              </Button>
+            </a>
           </div>
         </div>
       </section>
