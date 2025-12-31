@@ -89,6 +89,12 @@ const Footer = () => {
             <h4 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Contact</h4>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start text-gray-400">
+                <Phone className="w-4 h-4 mr-2 mt-0.5 text-cyan-400" />
+                <a href="tel:+18163668960" className="hover:text-cyan-400 transition-colors">
+                  (816) 366-8960
+                </a>
+              </li>
+              <li className="flex items-start text-gray-400">
                 <Mail className="w-4 h-4 mr-2 mt-0.5 text-cyan-400" />
                 <a href="mailto:Patrickjchurch04@gmail.com" className="hover:text-cyan-400 transition-colors">
                   Patrickjchurch04@gmail.com
