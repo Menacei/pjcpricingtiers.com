@@ -71,14 +71,22 @@ const AboutPage = () => {
                 </p>
               </div>
 
-              <div className="flex items-center space-x-6 mt-8">
+              <div className="flex flex-wrap items-center gap-4 mt-8">
+                <a href="tel:+18163668960" className="flex items-center text-gray-400 hover:text-cyan-400">
+                  <Phone className="w-5 h-5 mr-2 text-green-400" />
+                  (816) 366-8960
+                </a>
+                <a href="mailto:Patrickjchurch04@gmail.com" className="flex items-center text-gray-400 hover:text-cyan-400">
+                  <Mail className="w-5 h-5 mr-2 text-cyan-400" />
+                  Email Me
+                </a>
                 <div className="flex items-center text-gray-400">
-                  <MapPin className="w-5 h-5 mr-2 text-cyan-400" />
+                  <MapPin className="w-5 h-5 mr-2 text-purple-400" />
                   Kansas City, MO
                 </div>
-                <a href="mailto:Patrickjchurch04@gmail.com" className="flex items-center text-gray-400 hover:text-cyan-400">
-                  <Mail className="w-5 h-5 mr-2" />
-                  Email Me
+                <a href="https://www.youtube.com/@Patrick-z8m4b" target="_blank" rel="noopener noreferrer" className="flex items-center text-gray-400 hover:text-red-400">
+                  <Youtube className="w-5 h-5 mr-2 text-red-400" />
+                  YouTube
                 </a>
               </div>
             </div>
