@@ -1727,19 +1727,25 @@ async def track_lead_activity(lead_id: str, activity_type: str, activity_data: O
         logging.error(f"Track activity error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to track activity")
 
+# Newsletter subscription model
+class NewsletterSubscribeRequest(BaseModel):
+    email: str
+    name: Optional[str] = None
+    interests: List[str] = []
+
 @api_router.post("/newsletter/subscribe")
-async def subscribe_newsletter(email: str, name: Optional[str] = None, interests: List[str] = []):
+async def subscribe_newsletter(request: NewsletterSubscribeRequest):
     """Subscribe to newsletter"""
     try:
         # Check if already subscribed
-        existing = await db.newsletter_subscriptions.find_one({"email": email})
+        existing = await db.newsletter_subscriptions.find_one({"email": request.email})
         if existing:
             return {"message": "Already subscribed", "status": "existing"}
         
         subscription = NewsletterSubscription(
-            email=email,
-            name=name,
-            interests=interests
+            email=request.email,
+            name=request.name,
+            interests=request.interests
         )
         
         sub_dict = subscription.dict()
@@ -1748,14 +1754,13 @@ async def subscribe_newsletter(email: str, name: Optional[str] = None, interests
         
         # Also create/update lead
         lead_data = LeadCreate(
-            email=email,
-            name=name,
-            lead_source="newsletter",
-            lead_magnet="newsletter_signup"
+            full_name=request.name or "",
+            email=request.email,
+            lead_source="newsletter"
         )
         
         try:
-            existing_lead = await db.leads.find_one({"email": email})
+            existing_lead = await db.leads.find_one({"email": request.email})
             if not existing_lead:
                 await create_lead(lead_data)
             else:
