@@ -63,6 +63,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/tools" element={<ToolsPage />} />
 
           {/* Funnel Pages */}
           <Route path="/get-quote" element={<LeadFormPage />} />
