@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Request, BackgroundTasks
+from fastapi import FastAPI, APIRouter, HTTPException, Request, BackgroundTasks, Depends, Header
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -18,10 +18,15 @@ import aiohttp
 from bs4 import BeautifulSoup
 import re
 import json
+import secrets
+import hashlib
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Admin API key for secure endpoints
+ADMIN_API_KEY = os.environ.get('ADMIN_API_KEY', secrets.token_urlsafe(32))
+logging.info(f"Admin API Key set. Use this key for admin endpoints.")
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -33,6 +38,12 @@ app = FastAPI()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+
+# Admin authentication dependency
+async def verify_admin_key(x_admin_key: Optional[str] = Header(None)):
+    """Verify admin API key for protected endpoints"""
+    if not x_admin_key or x_admin_key != ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid or missing admin API key")
 
 # Define Models
 class StatusCheck(BaseModel):
