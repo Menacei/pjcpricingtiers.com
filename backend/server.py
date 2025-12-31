@@ -597,6 +597,32 @@ async def initialize_lead_magnets():
 async def root():
     return {"message": "PJC Web Designs API"}
 
+# Admin authentication models and endpoints
+class AdminLoginRequest(BaseModel):
+    username: str
+    password: str
+
+@api_router.post("/admin/login")
+async def admin_login(request: AdminLoginRequest):
+    """Admin login to get API key"""
+    # Get admin credentials from environment
+    admin_username = os.environ.get('ADMIN_USERNAME', 'admin')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'pjc_admin_2025')
+    
+    if request.username == admin_username and request.password == admin_password:
+        return {
+            "success": True,
+            "api_key": ADMIN_API_KEY,
+            "message": "Login successful. Use this key in X-Admin-Key header for protected endpoints."
+        }
+    else:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@api_router.get("/admin/verify")
+async def verify_admin(_: None = Depends(verify_admin_key)):
+    """Verify admin API key is valid"""
+    return {"valid": True, "message": "API key is valid"}
+
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.dict()
