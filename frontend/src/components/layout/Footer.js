@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
-import { Facebook, Twitter, Linkedin, Instagram, Share2, Mail, MapPin, Phone } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, Share2, Mail, MapPin, Phone, Youtube } from 'lucide-react';
 
 const Footer = () => {
   const socialMediaLinks = {
