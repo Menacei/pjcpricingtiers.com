@@ -1831,47 +1831,37 @@ def calculate_lead_score(lead_data: LeadCreate) -> int:
     score = 0
     
     # Basic contact info
-    if lead_data.name:
+    if lead_data.full_name:
         score += 10
     if lead_data.phone:
         score += 15
-    if lead_data.company:
+    if lead_data.business_type:
         score += 20
-    if lead_data.website:
-        score += 10
+    if lead_data.biggest_problem:
+        score += 15
     
-    # Budget and project info
+    # Budget scoring - higher budget = higher score
     budget_scores = {
         "under_500": 5,
-        "500_1000": 25,
-        "1000_5000": 50,
-        "5000_10000": 75,
-        "over_10000": 100
+        "500_1000": 15,
+        "1000_2500": 25,
+        "2500_5000": 40,
+        "5000_10000": 60,
+        "over_10000": 80
     }
     if lead_data.budget_range and lead_data.budget_range in budget_scores:
         score += budget_scores[lead_data.budget_range]
     
-    # Timeline urgency
-    timeline_scores = {
-        "immediate": 50,
-        "1_month": 40,
-        "3_months": 30,
-        "6_months": 20,
-        "flexible": 10
+    # Source quality
+    source_scores = {
+        "organic": 20,
+        "referral": 30,
+        "paid": 25,
+        "social": 15,
+        "direct": 10
     }
-    if lead_data.timeline and lead_data.timeline in timeline_scores:
-        score += timeline_scores[lead_data.timeline]
-    
-    # Project type
-    project_scores = {
-        "new_website": 30,
-        "redesign": 35,
-        "ecommerce": 40,
-        "web_app": 45,
-        "maintenance": 15
-    }
-    if lead_data.project_type and lead_data.project_type in project_scores:
-        score += project_scores[lead_data.project_type]
+    if lead_data.lead_source and lead_data.lead_source in source_scores:
+        score += source_scores[lead_data.lead_source]
     
     return min(score, 100)  # Cap at 100
 
