@@ -1574,8 +1574,8 @@ async def create_lead(lead_data: LeadCreate):
         raise HTTPException(status_code=500, detail="Failed to create lead")
 
 @api_router.get("/leads")
-async def get_leads(status: Optional[str] = None, source: Optional[str] = None, limit: int = 100):
-    """Get leads with optional filters for admin dashboard"""
+async def get_leads(status: Optional[str] = None, source: Optional[str] = None, limit: int = 100, _: None = Depends(verify_admin_key)):
+    """Get leads with optional filters for admin dashboard (PROTECTED)"""
     try:
         filter_query = {}
         if status:
@@ -1591,8 +1591,8 @@ async def get_leads(status: Optional[str] = None, source: Optional[str] = None, 
         raise HTTPException(status_code=500, detail="Failed to get leads")
 
 @api_router.get("/leads/{lead_id}")
-async def get_lead(lead_id: str):
-    """Get single lead by ID"""
+async def get_lead(lead_id: str, _: None = Depends(verify_admin_key)):
+    """Get single lead by ID (PROTECTED)"""
     try:
         lead = await db.leads.find_one({"id": lead_id}, {"_id": 0})
         if not lead:
@@ -1605,8 +1605,8 @@ async def get_lead(lead_id: str):
         raise HTTPException(status_code=500, detail="Failed to get lead")
 
 @api_router.patch("/leads/{lead_id}")
-async def update_lead(lead_id: str, update_data: LeadUpdate):
-    """Update lead status, notes, or booking info"""
+async def update_lead(lead_id: str, update_data: LeadUpdate, _: None = Depends(verify_admin_key)):
+    """Update lead status, notes, or booking info (PROTECTED)"""
     try:
         update_dict = {k: v for k, v in update_data.dict().items() if v is not None}
         update_dict['last_activity'] = datetime.now(timezone.utc).isoformat()
@@ -1630,8 +1630,8 @@ async def update_lead(lead_id: str, update_data: LeadUpdate):
         raise HTTPException(status_code=500, detail="Failed to update lead")
 
 @api_router.delete("/leads/{lead_id}")
-async def delete_lead(lead_id: str):
-    """Delete a lead"""
+async def delete_lead(lead_id: str, _: None = Depends(verify_admin_key)):
+    """Delete a lead (PROTECTED)"""
     try:
         result = await db.leads.delete_one({"id": lead_id})
         if result.deleted_count == 0:
@@ -1644,8 +1644,8 @@ async def delete_lead(lead_id: str):
         raise HTTPException(status_code=500, detail="Failed to delete lead")
 
 @api_router.get("/leads/stats/summary")
-async def get_leads_stats():
-    """Get lead statistics for dashboard"""
+async def get_leads_stats(_: None = Depends(verify_admin_key)):
+    """Get lead statistics for dashboard (PROTECTED)"""
     try:
         total = await db.leads.count_documents({})
         new_count = await db.leads.count_documents({"status": "new"})
