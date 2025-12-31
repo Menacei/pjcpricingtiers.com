@@ -202,7 +202,8 @@ class TestLeadsCRUD:
             "lead_source": "organic"
         }
         create_response = requests.post(f"{BASE_URL}/api/leads", json=lead_data)
-        lead_id = create_response.json()["id"]
+        create_data = create_response.json()
+        lead_id = create_data.get("lead_id") or create_data.get("id")
         
         # Update status
         update_data = {"status": "contacted", "notes": "Called on test date"}
