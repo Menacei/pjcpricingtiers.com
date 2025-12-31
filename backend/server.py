@@ -1531,47 +1531,142 @@ async def create_lead(lead_data: LeadCreate):
         score = calculate_lead_score(lead_data)
         
         lead = Lead(
-            **lead_data.dict(),
+            full_name=lead_data.full_name,
+            email=lead_data.email,
+            phone=lead_data.phone,
+            business_type=lead_data.business_type,
+            biggest_problem=lead_data.biggest_problem,
+            budget_range=lead_data.budget_range,
+            lead_source=lead_data.lead_source,
+            utm_source=lead_data.utm_source,
+            utm_medium=lead_data.utm_medium,
+            utm_campaign=lead_data.utm_campaign,
+            landing_page=lead_data.landing_page,
+            referrer=lead_data.referrer,
             lead_score=score,
-            status="qualified" if score >= 50 else "new"
+            status="new"
         )
         
         lead_dict = lead.dict()
         lead_dict['timestamp'] = lead_dict['timestamp'].isoformat()
         lead_dict['last_activity'] = lead_dict['last_activity'].isoformat()
+        if lead_dict.get('booking_datetime'):
+            lead_dict['booking_datetime'] = lead_dict['booking_datetime'].isoformat()
         await db.leads.insert_one(lead_dict)
         
         # Log lead creation activity
         await log_lead_activity(lead.id, "lead_created", {"source": lead_data.lead_source}, 10)
         
-        # Send welcome email (would integrate with email service)
-        await send_lead_welcome_email(lead.email, lead.name)
-        
-        return lead
+        return {"success": True, "lead_id": lead.id, "message": "Lead captured successfully"}
     except Exception as e:
         logging.error(f"Create lead error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create lead")
 
-@api_router.get("/leads", response_model=List[Lead])
-async def get_leads(status: Optional[str] = None, limit: int = 50):
-    """Get leads with optional status filter"""
+@api_router.get("/leads")
+async def get_leads(status: Optional[str] = None, source: Optional[str] = None, limit: int = 100):
+    """Get leads with optional filters for admin dashboard"""
     try:
         filter_query = {}
         if status:
             filter_query["status"] = status
+        if source:
+            filter_query["lead_source"] = source
             
-        leads = await db.leads.find(filter_query).sort("timestamp", -1).limit(limit).to_list(limit)
+        leads = await db.leads.find(filter_query, {"_id": 0}).sort("timestamp", -1).limit(limit).to_list(limit)
         
-        for lead in leads:
-            if isinstance(lead.get('timestamp'), str):
-                lead['timestamp'] = datetime.fromisoformat(lead['timestamp'])
-            if isinstance(lead.get('last_activity'), str):
-                lead['last_activity'] = datetime.fromisoformat(lead['last_activity'])
-        
-        return [Lead(**lead) for lead in leads]
+        return leads
     except Exception as e:
         logging.error(f"Get leads error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get leads")
+
+@api_router.get("/leads/{lead_id}")
+async def get_lead(lead_id: str):
+    """Get single lead by ID"""
+    try:
+        lead = await db.leads.find_one({"id": lead_id}, {"_id": 0})
+        if not lead:
+            raise HTTPException(status_code=404, detail="Lead not found")
+        return lead
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Get lead error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get lead")
+
+@api_router.patch("/leads/{lead_id}")
+async def update_lead(lead_id: str, update_data: LeadUpdate):
+    """Update lead status, notes, or booking info"""
+    try:
+        update_dict = {k: v for k, v in update_data.dict().items() if v is not None}
+        update_dict['last_activity'] = datetime.now(timezone.utc).isoformat()
+        
+        if update_data.booking_datetime:
+            update_dict['booking_datetime'] = update_data.booking_datetime.isoformat()
+        
+        result = await db.leads.update_one(
+            {"id": lead_id},
+            {"$set": update_dict}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Lead not found")
+            
+        return {"success": True, "message": "Lead updated"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Update lead error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update lead")
+
+@api_router.delete("/leads/{lead_id}")
+async def delete_lead(lead_id: str):
+    """Delete a lead"""
+    try:
+        result = await db.leads.delete_one({"id": lead_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Lead not found")
+        return {"success": True, "message": "Lead deleted"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Delete lead error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete lead")
+
+@api_router.get("/leads/stats/summary")
+async def get_leads_stats():
+    """Get lead statistics for dashboard"""
+    try:
+        total = await db.leads.count_documents({})
+        new_count = await db.leads.count_documents({"status": "new"})
+        contacted = await db.leads.count_documents({"status": "contacted"})
+        booked = await db.leads.count_documents({"status": "booked"})
+        closed = await db.leads.count_documents({"status": "closed"})
+        
+        # Source breakdown
+        organic = await db.leads.count_documents({"lead_source": "organic"})
+        paid = await db.leads.count_documents({"lead_source": "paid"})
+        social = await db.leads.count_documents({"lead_source": "social"})
+        referral = await db.leads.count_documents({"lead_source": "referral"})
+        
+        return {
+            "total": total,
+            "by_status": {
+                "new": new_count,
+                "contacted": contacted,
+                "booked": booked,
+                "closed": closed
+            },
+            "by_source": {
+                "organic": organic,
+                "paid": paid,
+                "social": social,
+                "referral": referral
+            },
+            "conversion_rate": round((closed / total * 100) if total > 0 else 0, 1)
+        }
+    except Exception as e:
+        logging.error(f"Get lead stats error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get stats")
 
 @api_router.post("/leads/{lead_id}/activity")
 async def track_lead_activity(lead_id: str, activity_type: str, activity_data: Optional[Dict] = None):
