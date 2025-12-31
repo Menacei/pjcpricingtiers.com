@@ -8,7 +8,8 @@ const Footer = () => {
     facebook: "https://www.facebook.com/pjcwebdesigns",
     twitter: "https://www.twitter.com/pjcwebdesigns", 
     linkedin: "https://www.linkedin.com/in/patrickjameschurch",
-    instagram: "https://www.instagram.com/pjcwebdesigns"
+    instagram: "https://www.instagram.com/pjcwebdesigns",
+    youtube: "https://www.youtube.com/@Patrick-z8m4b"
   };
 
   const openSocialPlatform = (platform) => {
@@ -22,6 +23,7 @@ const Footer = () => {
       case 'twitter': return <Twitter className="w-4 h-4" />;
       case 'linkedin': return <Linkedin className="w-4 h-4" />;
       case 'instagram': return <Instagram className="w-4 h-4" />;
+      case 'youtube': return <Youtube className="w-4 h-4" />;
       default: return <Share2 className="w-4 h-4" />;
     }
   };
