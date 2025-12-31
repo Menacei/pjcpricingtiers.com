@@ -1793,8 +1793,8 @@ async def download_lead_magnet(magnet_id: str, email: str, name: Optional[str] =
         raise HTTPException(status_code=500, detail="Failed to download lead magnet")
 
 @api_router.get("/leads/analytics")
-async def get_lead_analytics():
-    """Get lead generation analytics"""
+async def get_lead_analytics(_: None = Depends(verify_admin_key)):
+    """Get lead generation analytics (PROTECTED)"""
     try:
         # Total leads
         total_leads = await db.leads.count_documents({})
