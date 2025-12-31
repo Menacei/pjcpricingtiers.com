@@ -12,7 +12,9 @@ import {
   MapPin,
   Mail,
   Calendar,
-  CheckCircle
+  CheckCircle,
+  Phone,
+  Youtube
 } from 'lucide-react';
 
 const AboutPage = () => {
