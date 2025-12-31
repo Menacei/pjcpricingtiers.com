@@ -1911,6 +1911,112 @@ async def send_lead_welcome_email(email: str, name: Optional[str]):
     except Exception as e:
         logging.error(f"Send welcome email error: {str(e)}")
 
+# ============ WEBHOOKS & TRACKING ============
+
+class WebhookEvent(BaseModel):
+    event_type: str
+    event_data: Dict[str, Any]
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.post("/webhooks/receive")
+async def receive_webhook(event: WebhookEvent):
+    """Generic webhook receiver for external integrations"""
+    try:
+        webhook_log = {
+            "id": str(uuid.uuid4()),
+            "event_type": event.event_type,
+            "event_data": event.event_data,
+            "timestamp": event.timestamp.isoformat(),
+            "processed": False
+        }
+        await db.webhook_logs.insert_one(webhook_log)
+        
+        # Process based on event type
+        if event.event_type == "booking_confirmed":
+            lead_id = event.event_data.get("lead_id")
+            if lead_id:
+                await db.leads.update_one(
+                    {"id": lead_id},
+                    {"$set": {"status": "booked", "booking_scheduled": True}}
+                )
+        
+        return {"success": True, "message": "Webhook received"}
+    except Exception as e:
+        logging.error(f"Webhook error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Webhook processing failed")
+
+@api_router.post("/tracking/event")
+async def track_event(event_name: str, event_data: Optional[Dict] = None, session_id: Optional[str] = None):
+    """Track custom events for analytics"""
+    try:
+        tracking_event = {
+            "id": str(uuid.uuid4()),
+            "event_name": event_name,
+            "event_data": event_data or {},
+            "session_id": session_id,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        await db.tracking_events.insert_one(tracking_event)
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Tracking error: {str(e)}")
+        return {"success": False}
+
+@api_router.get("/tracking/pixel.gif")
+async def tracking_pixel(request: Request, event: str = "pageview", ref: Optional[str] = None):
+    """1x1 tracking pixel for email opens, etc."""
+    try:
+        tracking_event = {
+            "id": str(uuid.uuid4()),
+            "event_name": event,
+            "referrer": ref,
+            "user_agent": request.headers.get("user-agent"),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        await db.tracking_events.insert_one(tracking_event)
+    except Exception as e:
+        logging.error(f"Pixel tracking error: {str(e)}")
+    
+    # Return 1x1 transparent GIF
+    gif_bytes = b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b'
+    from fastapi.responses import Response
+    return Response(content=gif_bytes, media_type="image/gif")
+
+@api_router.get("/site-settings")
+async def get_site_settings():
+    """Get site settings including SEO and tracking IDs"""
+    settings = await db.site_settings.find_one({"id": "main"}, {"_id": 0})
+    if not settings:
+        settings = {
+            "id": "main",
+            "site_name": "Pat Church",
+            "tagline": "AI-Powered Web Design & Automation",
+            "meta_title": "Pat Church - Web Design, AI & Automation | Kansas City",
+            "meta_description": "I build websites that actually make money. AI integration, automation, and strategic web design for small businesses.",
+            "google_analytics_id": "",
+            "google_ads_id": "",
+            "meta_pixel_id": "",
+            "calendar_booking_url": "",
+            "primary_cta_text": "Get a Quote",
+            "secondary_cta_text": "Book a Call"
+        }
+    return settings
+
+@api_router.post("/site-settings")
+async def update_site_settings(settings: Dict[str, Any]):
+    """Update site settings"""
+    try:
+        settings["id"] = "main"
+        await db.site_settings.update_one(
+            {"id": "main"},
+            {"$set": settings},
+            upsert=True
+        )
+        return {"success": True, "message": "Settings updated"}
+    except Exception as e:
+        logging.error(f"Update settings error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update settings")
+
 # Include the router in the main app
 app.include_router(api_router)
 
