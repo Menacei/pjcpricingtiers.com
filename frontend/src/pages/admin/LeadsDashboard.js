@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
@@ -25,7 +25,10 @@ import {
   ChevronDown,
   ChevronUp,
   Trash2,
-  Edit
+  Edit,
+  Lock,
+  LogOut,
+  Shield
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -40,11 +43,81 @@ const LeadsDashboard = () => {
   const [filterSource, setFilterSource] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [editingNote, setEditingNote] = useState('');
+  
+  // Auth state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adminKey, setAdminKey] = useState('');
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  // Check for stored admin key on mount
+  useEffect(() => {
+    const storedKey = sessionStorage.getItem('adminApiKey');
+    if (storedKey) {
+      setAdminKey(storedKey);
+      verifyKey(storedKey);
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const verifyKey = async (key) => {
+    try {
+      await axios.get(`${API}/admin/verify`, {
+        headers: { 'X-Admin-Key': key }
+      });
+      setIsAuthenticated(true);
+      setAdminKey(key);
+    } catch (error) {
+      sessionStorage.removeItem('adminApiKey');
+      setIsAuthenticated(false);
+    }
+    setLoading(false);
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    setLoginLoading(true);
+    
+    try {
+      const response = await axios.post(`${API}/admin/login`, {
+        username: loginUsername,
+        password: loginPassword
+      });
+      
+      const key = response.data.api_key;
+      sessionStorage.setItem('adminApiKey', key);
+      setAdminKey(key);
+      setIsAuthenticated(true);
+    } catch (error) {
+      setLoginError('Invalid credentials. Please try again.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('adminApiKey');
+    setAdminKey('');
+    setIsAuthenticated(false);
+    setLeads([]);
+    setStats(null);
+  };
+
+  // Axios instance with auth header
+  const authAxios = axios.create({
+    headers: { 'X-Admin-Key': adminKey }
+  });
 
   useEffect(() => {
-    fetchLeads();
-    fetchStats();
-  }, [filterStatus, filterSource]);
+    if (isAuthenticated && adminKey) {
+      fetchLeads();
+      fetchStats();
+    }
+  }, [filterStatus, filterSource, isAuthenticated, adminKey]);
 
   const fetchLeads = async () => {
     try {
@@ -52,10 +125,13 @@ const LeadsDashboard = () => {
       if (filterStatus !== 'all') url += `&status=${filterStatus}`;
       if (filterSource !== 'all') url += `&source=${filterSource}`;
       
-      const response = await axios.get(url);
+      const response = await authAxios.get(url);
       setLeads(response.data);
     } catch (error) {
       console.error('Error fetching leads:', error);
+      if (error.response?.status === 401) {
+        handleLogout();
+      }
     } finally {
       setLoading(false);
     }
@@ -63,7 +139,7 @@ const LeadsDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get(`${API}/leads/stats/summary`);
+      const response = await authAxios.get(`${API}/leads/stats/summary`);
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -72,7 +148,7 @@ const LeadsDashboard = () => {
 
   const updateLeadStatus = async (leadId, newStatus) => {
     try {
-      await axios.patch(`${API}/leads/${leadId}`, { status: newStatus });
+      await authAxios.patch(`${API}/leads/${leadId}`, { status: newStatus });
       fetchLeads();
       fetchStats();
     } catch (error) {
@@ -82,7 +158,7 @@ const LeadsDashboard = () => {
 
   const updateLeadNotes = async (leadId, notes) => {
     try {
-      await axios.patch(`${API}/leads/${leadId}`, { notes });
+      await authAxios.patch(`${API}/leads/${leadId}`, { notes });
       fetchLeads();
       setEditingNote('');
     } catch (error) {
@@ -93,7 +169,7 @@ const LeadsDashboard = () => {
   const deleteLead = async (leadId) => {
     if (!window.confirm('Are you sure you want to delete this lead?')) return;
     try {
-      await axios.delete(`${API}/leads/${leadId}`);
+      await authAxios.delete(`${API}/leads/${leadId}`);
       fetchLeads();
       fetchStats();
       setSelectedLead(null);
@@ -142,6 +218,74 @@ const LeadsDashboard = () => {
     });
   };
 
+  // Login Screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-20 pb-12 flex items-center justify-center">
+        <Card className="w-full max-w-md bg-slate-800/50 border-slate-700">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-cyan-600/20 rounded-full">
+                <Shield className="w-8 h-8 text-cyan-400" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-white">Admin Login</CardTitle>
+            <CardDescription>Enter your credentials to access the lead dashboard</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              {loginError && (
+                <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                  {loginError}
+                </div>
+              )}
+              
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">Username</label>
+                <Input
+                  type="text"
+                  value={loginUsername}
+                  onChange={(e) => setLoginUsername(e.target.value)}
+                  className="bg-slate-700 border-slate-600 text-white"
+                  placeholder="Enter username"
+                  required
+                  data-testid="admin-username"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">Password</label>
+                <Input
+                  type="password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="bg-slate-700 border-slate-600 text-white"
+                  placeholder="Enter password"
+                  required
+                  data-testid="admin-password"
+                />
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={loginLoading}
+                data-testid="admin-login-btn"
+              >
+                {loginLoading ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Lock className="w-4 h-4 mr-2" />
+                )}
+                {loginLoading ? 'Logging in...' : 'Login'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -151,10 +295,16 @@ const LeadsDashboard = () => {
             <h1 className="text-3xl font-bold text-white mb-2">Lead Dashboard</h1>
             <p className="text-gray-400">Manage and track your leads</p>
           </div>
-          <Button onClick={() => { fetchLeads(); fetchStats(); }} className="mt-4 md:mt-0">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
+          <div className="flex gap-3 mt-4 md:mt-0">
+            <Button onClick={() => { fetchLeads(); fetchStats(); }} variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+            <Button onClick={handleLogout} variant="destructive">
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -231,6 +381,7 @@ const LeadsDashboard = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 bg-slate-800 border-slate-700 text-white"
+              data-testid="lead-search"
             />
           </div>
           
@@ -271,7 +422,7 @@ const LeadsDashboard = () => {
               <div className="p-8 text-center text-gray-400">No leads found</div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full" data-testid="leads-table">
                   <thead>
                     <tr className="border-b border-slate-700">
                       <th className="text-left p-4 text-gray-400 font-medium">Lead</th>
@@ -290,6 +441,7 @@ const LeadsDashboard = () => {
                         key={lead.id} 
                         className="border-b border-slate-700/50 hover:bg-slate-700/30 cursor-pointer"
                         onClick={() => setSelectedLead(selectedLead?.id === lead.id ? null : lead)}
+                        data-testid={`lead-row-${lead.id}`}
                       >
                         <td className="p-4">
                           <div className="font-medium text-white">{lead.full_name}</div>
@@ -356,6 +508,7 @@ const LeadsDashboard = () => {
                   variant="destructive" 
                   size="sm"
                   onClick={() => deleteLead(selectedLead.id)}
+                  data-testid="delete-lead-btn"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Delete
@@ -388,10 +541,12 @@ const LeadsDashboard = () => {
                   value={editingNote || selectedLead.notes || ''}
                   onChange={(e) => setEditingNote(e.target.value)}
                   className="bg-slate-900/50 border-slate-700 text-white mb-3"
+                  data-testid="lead-notes"
                 />
                 <Button 
                   onClick={() => updateLeadNotes(selectedLead.id, editingNote)}
                   disabled={!editingNote}
+                  data-testid="save-notes-btn"
                 >
                   Save Notes
                 </Button>
