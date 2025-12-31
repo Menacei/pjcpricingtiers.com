@@ -214,8 +214,19 @@ class TestLeadsCRUD:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] == "contacted"
-        print(f"✅ Lead status updated to: {data['status']}")
+        # API returns success message, not full lead object
+        assert data.get("success") == True
+        print(f"✅ Lead status updated successfully")
+        
+        # Verify by fetching the lead
+        get_response = requests.get(
+            f"{BASE_URL}/api/leads/{lead_id}",
+            headers=auth_headers
+        )
+        assert get_response.status_code == 200
+        lead_data = get_response.json()
+        assert lead_data["status"] == "contacted"
+        print(f"✅ Lead status verified: {lead_data['status']}")
     
     def test_delete_lead(self, auth_headers):
         """Test deleting a lead"""
