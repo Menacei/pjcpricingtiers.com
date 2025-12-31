@@ -315,13 +315,15 @@ class TestNewsletterSubscription:
     """Test newsletter subscription endpoint"""
     
     def test_subscribe_newsletter(self):
-        """Test newsletter subscription"""
-        sub_data = {
-            "email": "test_newsletter@example.com",
-            "name": "TEST_Newsletter User",
-            "interests": ["web_design", "ai"]
-        }
-        response = requests.post(f"{BASE_URL}/api/newsletter/subscribe", json=sub_data)
+        """Test newsletter subscription - uses query params"""
+        # Newsletter endpoint uses query parameters, not JSON body
+        response = requests.post(
+            f"{BASE_URL}/api/newsletter/subscribe",
+            params={
+                "email": "test_newsletter@example.com",
+                "name": "TEST_Newsletter User"
+            }
+        )
         # Could be 200 or 201 depending on implementation
         assert response.status_code in [200, 201]
         print(f"✅ Newsletter subscription: status={response.status_code}")
