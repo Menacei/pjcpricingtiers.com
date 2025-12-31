@@ -353,11 +353,24 @@ const NewReachTransportPage = () => {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </a>
-            <a href="tel:+1234567890">
+            <a href="tel:+18163668960">
               <Button size="lg" variant="outline" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 px-8 py-6 text-lg">
                 <Phone className="mr-2 w-5 h-5" />
-                Call Now
+                (816) 366-8960
               </Button>
+            </a>
+          </div>
+
+          {/* Quick Links */}
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
+            <a href="https://www.newreachtransport.com" target="_blank" rel="noopener noreferrer" className="flex items-center text-gray-400 hover:text-orange-400 transition-colors">
+              <Globe className="w-4 h-4 mr-2" />
+              newreachtransport.com
+              <ExternalLink className="w-3 h-3 ml-1" />
+            </a>
+            <a href="https://usdirectory.com/NewReach-Transport-Kansas-City-MO" target="_blank" rel="noopener noreferrer" className="flex items-center text-gray-400 hover:text-orange-400 transition-colors">
+              <ExternalLink className="w-4 h-4 mr-2" />
+              US Directory
             </a>
           </div>
         </div>
