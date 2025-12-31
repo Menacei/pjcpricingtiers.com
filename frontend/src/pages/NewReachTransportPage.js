@@ -604,17 +604,33 @@ const NewReachTransportPage = () => {
 
               {/* Contact Info */}
               <div className="mt-8 pt-8 border-t border-slate-700">
-                <div className="grid md:grid-cols-2 gap-6 text-center">
+                <div className="grid md:grid-cols-3 gap-6 text-center">
+                  <div className="flex flex-col items-center">
+                    <Phone className="w-6 h-6 text-orange-400 mb-2" />
+                    <a href="tel:+18163668960" className="text-gray-300 hover:text-orange-400 transition-colors text-sm font-semibold">
+                      (816) 366-8960
+                    </a>
+                  </div>
                   <div className="flex flex-col items-center">
                     <Mail className="w-6 h-6 text-orange-400 mb-2" />
-                    <a href="mailto:Patrickjchurch04@gmail.com" className="text-gray-300 hover:text-orange-400 transition-colors text-sm">
-                      Patrickjchurch04@gmail.com
+                    <a href="mailto:info@newreachtransport.com" className="text-gray-300 hover:text-orange-400 transition-colors text-sm">
+                      info@newreachtransport.com
                     </a>
                   </div>
                   <div className="flex flex-col items-center">
                     <MapPin className="w-6 h-6 text-orange-400 mb-2" />
                     <span className="text-gray-300 text-sm">Kansas City, MO</span>
                   </div>
+                </div>
+                <div className="flex justify-center gap-6 mt-6">
+                  <a href="https://www.newreachtransport.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-orange-400 transition-colors text-sm flex items-center">
+                    <Globe className="w-4 h-4 mr-1" />
+                    Website
+                  </a>
+                  <a href="https://usdirectory.com/NewReach-Transport-Kansas-City-MO" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-orange-400 transition-colors text-sm flex items-center">
+                    <ExternalLink className="w-4 h-4 mr-1" />
+                    US Directory
+                  </a>
                 </div>
               </div>
             </CardContent>
