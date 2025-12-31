@@ -168,33 +168,51 @@ class SocialMediaPostCreate(BaseModel):
 # Lead Generation Models
 class Lead(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    # Core fields
+    full_name: str
     email: str
-    name: Optional[str] = None
     phone: Optional[str] = None
-    company: Optional[str] = None
-    website: Optional[str] = None
+    business_type: Optional[str] = None
+    biggest_problem: Optional[str] = None
     budget_range: Optional[str] = None
-    project_type: Optional[str] = None
-    timeline: Optional[str] = None
-    lead_source: str = "website"
-    lead_magnet: Optional[str] = None
+    # Tracking fields
+    lead_source: str = "organic"  # organic, paid, social, referral, direct
+    utm_source: Optional[str] = None
+    utm_medium: Optional[str] = None
+    utm_campaign: Optional[str] = None
+    landing_page: Optional[str] = None
+    referrer: Optional[str] = None
+    # Status and scoring
+    status: str = "new"  # new, contacted, booked, closed, lost
     lead_score: int = 0
-    status: str = "new"  # new, qualified, contacted, converted, lost
     notes: Optional[str] = None
+    # Booking info
+    booking_scheduled: bool = False
+    booking_datetime: Optional[datetime] = None
+    # Timestamps
     last_activity: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class LeadCreate(BaseModel):
+    full_name: str
     email: str
-    name: Optional[str] = None
     phone: Optional[str] = None
-    company: Optional[str] = None
-    website: Optional[str] = None
+    business_type: Optional[str] = None
+    biggest_problem: Optional[str] = None
     budget_range: Optional[str] = None
-    project_type: Optional[str] = None
-    timeline: Optional[str] = None
-    lead_source: str = "website"
-    lead_magnet: Optional[str] = None
+    lead_source: str = "organic"
+    utm_source: Optional[str] = None
+    utm_medium: Optional[str] = None
+    utm_campaign: Optional[str] = None
+    landing_page: Optional[str] = None
+    referrer: Optional[str] = None
+
+class LeadUpdate(BaseModel):
+    status: Optional[str] = None
+    notes: Optional[str] = None
+    lead_score: Optional[int] = None
+    booking_scheduled: Optional[bool] = None
+    booking_datetime: Optional[datetime] = None
 
 class LeadActivity(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
