@@ -123,6 +123,10 @@ const ToolsPage = () => {
     if (!results || !results.success) return null;
 
     const { seo_data, quality_analysis, contact_info, ai_insights } = results;
+    
+    // Safe defaults for nested objects
+    const safeQuality = quality_analysis || { overall_score: 0, scores: {}, issues: [], recommendations: [] };
+    const safeSeo = seo_data || { title: '', title_length: 0, description: '', description_length: 0, word_count: 0, internal_links_count: 0, total_images: 0, h1_tags: [] };
 
     return (
       <div className="space-y-6">
@@ -133,8 +137,8 @@ const ToolsPage = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center">
-              <div className={`text-6xl font-bold ${getScoreColor(quality_analysis.overall_score)}`}>
-                {quality_analysis.overall_score}
+              <div className={`text-6xl font-bold ${getScoreColor(safeQuality.overall_score || 0)}`}>
+                {safeQuality.overall_score || 0}
               </div>
               <span className="text-2xl text-gray-400 ml-2">/100</span>
             </div>
@@ -142,21 +146,23 @@ const ToolsPage = () => {
         </Card>
 
         {/* Score Breakdown */}
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white">Score Breakdown</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {Object.entries(quality_analysis.scores).map(([key, score]) => (
-                <div key={key} className="text-center p-3 bg-slate-900/50 rounded-lg">
-                  <div className={`text-2xl font-bold ${getScoreColor(score)}`}>{score}</div>
-                  <div className="text-xs text-gray-400 capitalize">{key}</div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {safeQuality.scores && Object.keys(safeQuality.scores).length > 0 && (
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Score Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {Object.entries(safeQuality.scores).map(([key, score]) => (
+                  <div key={key} className="text-center p-3 bg-slate-900/50 rounded-lg">
+                    <div className={`text-2xl font-bold ${getScoreColor(score)}`}>{score}</div>
+                    <div className="text-xs text-gray-400 capitalize">{key}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Issues & Recommendations */}
         <div className="grid md:grid-cols-2 gap-6">
@@ -168,9 +174,9 @@ const ToolsPage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {quality_analysis.issues.length > 0 ? (
+              {safeQuality.issues && safeQuality.issues.length > 0 ? (
                 <ul className="space-y-2">
-                  {quality_analysis.issues.map((issue, idx) => (
+                  {safeQuality.issues.map((issue, idx) => (
                     <li key={idx} className="flex items-start text-gray-300">
                       <XCircle className="w-4 h-4 mr-2 text-red-400 flex-shrink-0 mt-0.5" />
                       {issue}
@@ -191,14 +197,18 @@ const ToolsPage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
-                {quality_analysis.recommendations.map((rec, idx) => (
-                  <li key={idx} className="flex items-start text-gray-300">
-                    <CheckCircle className="w-4 h-4 mr-2 text-cyan-400 flex-shrink-0 mt-0.5" />
-                    {rec}
-                  </li>
-                ))}
-              </ul>
+              {safeQuality.recommendations && safeQuality.recommendations.length > 0 ? (
+                <ul className="space-y-2">
+                  {safeQuality.recommendations.map((rec, idx) => (
+                    <li key={idx} className="flex items-start text-gray-300">
+                      <CheckCircle className="w-4 h-4 mr-2 text-cyan-400 flex-shrink-0 mt-0.5" />
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-400">No recommendations available</p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -210,28 +220,28 @@ const ToolsPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-gray-400 text-sm">Title ({seo_data.title_length} chars)</label>
-              <p className="text-white bg-slate-900/50 p-2 rounded">{seo_data.title || 'Not found'}</p>
+              <label className="text-gray-400 text-sm">Title ({safeSeo.title_length || 0} chars)</label>
+              <p className="text-white bg-slate-900/50 p-2 rounded">{safeSeo.title || 'Not found'}</p>
             </div>
             <div>
-              <label className="text-gray-400 text-sm">Meta Description ({seo_data.description_length} chars)</label>
-              <p className="text-white bg-slate-900/50 p-2 rounded">{seo_data.description || 'Not found'}</p>
+              <label className="text-gray-400 text-sm">Meta Description ({safeSeo.description_length || 0} chars)</label>
+              <p className="text-white bg-slate-900/50 p-2 rounded">{safeSeo.description || 'Not found'}</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-3 bg-slate-900/50 rounded">
-                <div className="text-xl font-bold text-white">{seo_data.word_count}</div>
+                <div className="text-xl font-bold text-white">{safeSeo.word_count || 0}</div>
                 <div className="text-xs text-gray-400">Words</div>
               </div>
               <div className="text-center p-3 bg-slate-900/50 rounded">
-                <div className="text-xl font-bold text-white">{seo_data.internal_links_count}</div>
+                <div className="text-xl font-bold text-white">{safeSeo.internal_links_count || 0}</div>
                 <div className="text-xs text-gray-400">Internal Links</div>
               </div>
               <div className="text-center p-3 bg-slate-900/50 rounded">
-                <div className="text-xl font-bold text-white">{seo_data.total_images}</div>
+                <div className="text-xl font-bold text-white">{safeSeo.total_images || 0}</div>
                 <div className="text-xs text-gray-400">Images</div>
               </div>
               <div className="text-center p-3 bg-slate-900/50 rounded">
-                <div className="text-xl font-bold text-white">{seo_data.h1_tags?.length || 0}</div>
+                <div className="text-xl font-bold text-white">{safeSeo.h1_tags?.length || 0}</div>
                 <div className="text-xs text-gray-400">H1 Tags</div>
               </div>
             </div>
@@ -256,49 +266,56 @@ const ToolsPage = () => {
   const renderLeadResults = () => {
     if (!results || !results.success) return null;
 
+    const strategies = results.search_strategies || [];
+    const criteria = results.lead_criteria || [];
+
     return (
       <div className="space-y-6">
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white">Search Strategies</CardTitle>
-            <CardDescription>Click to search these directories</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
-              {results.search_strategies.map((strategy, idx) => (
-                <a
-                  key={idx}
-                  href={strategy.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-4 bg-slate-900/50 rounded-lg hover:bg-slate-700 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold text-white">{strategy.source}</span>
-                    <ExternalLink className="w-4 h-4 text-cyan-400" />
-                  </div>
-                  <p className="text-sm text-gray-400">{strategy.query}</p>
-                </a>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {strategies.length > 0 && (
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Search Strategies</CardTitle>
+              <CardDescription>Click to search these directories</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-3 gap-4">
+                {strategies.map((strategy, idx) => (
+                  <a
+                    key={idx}
+                    href={strategy.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-4 bg-slate-900/50 rounded-lg hover:bg-slate-700 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-white">{strategy.source}</span>
+                      <ExternalLink className="w-4 h-4 text-cyan-400" />
+                    </div>
+                    <p className="text-sm text-gray-400">{strategy.query}</p>
+                  </a>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white">What to Look For</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {results.lead_criteria.map((criteria, idx) => (
-                <li key={idx} className="flex items-center text-gray-300">
-                  <Target className="w-4 h-4 mr-2 text-cyan-400" />
-                  {criteria}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+        {criteria.length > 0 && (
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">What to Look For</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {criteria.map((item, idx) => (
+                  <li key={idx} className="flex items-center text-gray-300">
+                    <Target className="w-4 h-4 mr-2 text-cyan-400" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
 
         {results.ai_recommendations && (
           <Card className="bg-slate-800/50 border-slate-700">
@@ -317,6 +334,10 @@ const ToolsPage = () => {
   const renderCompetitorResults = () => {
     if (!results || !results.success) return null;
 
+    const safeSeo = results.seo_data || { title: '', description: '', word_count: 0, internal_links_count: 0, total_images: 0 };
+    const safeStrengths = results.strengths || [];
+    const safeWeaknesses = results.weaknesses || [];
+
     return (
       <div className="space-y-6">
         <Card className="bg-slate-800/50 border-slate-700">
@@ -326,7 +347,7 @@ const ToolsPage = () => {
           <CardContent className="space-y-4">
             <div>
               <label className="text-gray-400 text-sm">Title</label>
-              <p className="text-white">{results.seo_data.title || 'Not found'}</p>
+              <p className="text-white">{safeSeo.title || 'Not found'}</p>
             </div>
             <div>
               <label className="text-gray-400 text-sm">Description</label>
