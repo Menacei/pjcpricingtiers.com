@@ -179,7 +179,8 @@ class TestLeadsCRUD:
         }
         create_response = requests.post(f"{BASE_URL}/api/leads", json=lead_data)
         assert create_response.status_code == 200
-        lead_id = create_response.json()["id"]
+        create_data = create_response.json()
+        lead_id = create_data.get("lead_id") or create_data.get("id")
         
         # Then get it
         response = requests.get(
