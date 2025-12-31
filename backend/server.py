@@ -987,7 +987,7 @@ async def create_blog_post(post_data: BlogPostCreate):
 async def track_social_share(post_id: str, platform: str):
     try:
         # Generate share URLs based on platform
-        base_url = "https://patjc-digital.preview.emergentagent.com"
+        base_url = "https://patjames-services.preview.emergentagent.com"
         post_url = f"{base_url}/blog/{post_id}"
         
         share_urls = {
@@ -1365,7 +1365,7 @@ async def get_sitemap():
     """Generate XML sitemap for SEO"""
     from fastapi.responses import Response
     
-    base_url = "https://patjc-digital.preview.emergentagent.com"
+    base_url = "https://patjames-services.preview.emergentagent.com"
     
     # Get blog posts for sitemap
     try:
@@ -1455,7 +1455,7 @@ async def get_seo_meta():
         "title": "Pat Church - AI-Powered Web Design & Automation | Kansas City",
         "description": "I'm Pat Church, and I build websites that actually make money. AI integration, automation, and strategic web design for small businesses in Kansas City and beyond.",
         "keywords": "AI web design, automation, lead generation, Kansas City web designer, small business websites, AI chatbots, custom automation",
-        "canonical": "https://patjc-digital.preview.emergentagent.com",
+        "canonical": "https://patjames-services.preview.emergentagent.com",
         "og_image": "https://images.unsplash.com/photo-1559028012-481c04fa702d",
         "structured_data": {
             "@context": "https://schema.org",
