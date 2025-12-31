@@ -351,9 +351,9 @@ const ToolsPage = () => {
             </div>
             <div>
               <label className="text-gray-400 text-sm">Description</label>
-              <p className="text-white">{results.seo_data.description || 'Not found'}</p>
+              <p className="text-white">{safeSeo.description || 'Not found'}</p>
             </div>
-            {results.technologies_detected.length > 0 && (
+            {results.technologies_detected && results.technologies_detected.length > 0 && (
               <div>
                 <label className="text-gray-400 text-sm">Technologies Detected</label>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -415,32 +415,36 @@ const ToolsPage = () => {
   const renderContentResults = () => {
     if (!results || !results.success) return null;
 
+    const tips = results.planning_tips || [];
+
     return (
       <div className="space-y-6">
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">Content Ideas for "{results.topic}"</CardTitle>
+            <CardTitle className="text-white">Content Ideas for "{results.topic || 'Your Topic'}"</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-300 whitespace-pre-line">{results.content_ideas}</p>
+            <p className="text-gray-300 whitespace-pre-line">{results.content_ideas || 'No content ideas available'}</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white">Content Planning Tips</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {results.planning_tips.map((tip, idx) => (
-                <li key={idx} className="flex items-start text-gray-300">
-                  <CheckCircle className="w-4 h-4 mr-2 text-cyan-400 flex-shrink-0 mt-0.5" />
-                  {tip}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+        {tips.length > 0 && (
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Content Planning Tips</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {tips.map((tip, idx) => (
+                  <li key={idx} className="flex items-start text-gray-300">
+                    <CheckCircle className="w-4 h-4 mr-2 text-cyan-400 flex-shrink-0 mt-0.5" />
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   };
