@@ -1523,7 +1523,7 @@ async def get_performance_data():
         return {"error": "Failed to get performance data"}
 
 # Lead Generation System Endpoints
-@api_router.post("/leads", response_model=Lead)
+@api_router.post("/leads")
 async def create_lead(lead_data: LeadCreate):
     """Create a new lead with automatic scoring"""
     try:
