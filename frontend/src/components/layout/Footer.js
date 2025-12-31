@@ -46,7 +46,7 @@ const Footer = () => {
               AI-powered web design & automation for small businesses that want to grow.
             </p>
             <div className="flex space-x-3">
-              {['facebook', 'twitter', 'linkedin', 'instagram'].map((platform) => (
+              {['facebook', 'twitter', 'linkedin', 'instagram', 'youtube'].map((platform) => (
                 <Button
                   key={platform}
                   variant="ghost"
