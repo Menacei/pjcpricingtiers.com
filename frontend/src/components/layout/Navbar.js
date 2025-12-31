@@ -11,6 +11,7 @@ const Navbar = () => {
   const mainLinks = [
     { path: '/', label: 'Home' },
     { path: '/services', label: 'Services' },
+    { path: '/tools', label: 'Tools' },
     { path: '/proof', label: 'Proof' },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' }
