@@ -15,6 +15,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import BlogPage from "./pages/BlogPage";
+import ToolsPage from "./pages/ToolsPage";
 
 // Funnel Pages
 import LeadFormPage from "./pages/funnel/LeadFormPage";
