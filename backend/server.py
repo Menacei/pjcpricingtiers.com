@@ -1911,6 +1911,453 @@ async def send_lead_welcome_email(email: str, name: Optional[str]):
     except Exception as e:
         logging.error(f"Send welcome email error: {str(e)}")
 
+# ============ WEB CRAWLERS & AI TOOLS ============
+
+class WebsiteAnalysisRequest(BaseModel):
+    url: str
+    analysis_type: str = "full"  # full, seo, performance, content
+
+class BusinessSearchRequest(BaseModel):
+    location: str
+    industry: str
+    keywords: Optional[str] = None
+
+class CompetitorAnalysisRequest(BaseModel):
+    competitor_url: str
+    your_url: Optional[str] = None
+
+class ContentResearchRequest(BaseModel):
+    topic: str
+    industry: Optional[str] = None
+
+async def fetch_url(url: str) -> tuple:
+    """Fetch URL content with error handling"""
+    try:
+        if not url.startswith('http'):
+            url = 'https://' + url
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers, timeout=15) as response:
+                if response.status == 200:
+                    content = await response.text()
+                    return content, None
+                else:
+                    return None, f"HTTP {response.status}"
+    except Exception as e:
+        return None, str(e)
+
+def extract_seo_data(html: str, url: str) -> dict:
+    """Extract SEO-relevant data from HTML"""
+    soup = BeautifulSoup(html, 'html.parser')
+    
+    # Title
+    title = soup.find('title')
+    title_text = title.get_text().strip() if title else None
+    
+    # Meta description
+    meta_desc = soup.find('meta', attrs={'name': 'description'})
+    description = meta_desc.get('content', '').strip() if meta_desc else None
+    
+    # Meta keywords
+    meta_keywords = soup.find('meta', attrs={'name': 'keywords'})
+    keywords = meta_keywords.get('content', '').strip() if meta_keywords else None
+    
+    # Headings
+    h1_tags = [h.get_text().strip() for h in soup.find_all('h1')]
+    h2_tags = [h.get_text().strip() for h in soup.find_all('h2')][:5]
+    
+    # Links
+    internal_links = []
+    external_links = []
+    for link in soup.find_all('a', href=True):
+        href = link.get('href', '')
+        if href.startswith('http') and url not in href:
+            external_links.append(href)
+        elif href.startswith('/') or url in href:
+            internal_links.append(href)
+    
+    # Images without alt
+    images = soup.find_all('img')
+    images_without_alt = sum(1 for img in images if not img.get('alt'))
+    
+    # Word count
+    text = soup.get_text()
+    word_count = len(text.split())
+    
+    return {
+        "title": title_text,
+        "title_length": len(title_text) if title_text else 0,
+        "description": description,
+        "description_length": len(description) if description else 0,
+        "keywords": keywords,
+        "h1_tags": h1_tags,
+        "h2_tags": h2_tags,
+        "internal_links_count": len(set(internal_links)),
+        "external_links_count": len(set(external_links)),
+        "total_images": len(images),
+        "images_without_alt": images_without_alt,
+        "word_count": word_count
+    }
+
+def extract_contact_info(html: str) -> dict:
+    """Extract contact information from HTML"""
+    soup = BeautifulSoup(html, 'html.parser')
+    text = soup.get_text()
+    
+    # Email patterns
+    email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+    emails = list(set(re.findall(email_pattern, text)))[:5]
+    
+    # Phone patterns
+    phone_pattern = r'[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}'
+    phones = list(set(re.findall(phone_pattern, text)))[:5]
+    
+    # Social links
+    social_links = {}
+    for link in soup.find_all('a', href=True):
+        href = link.get('href', '').lower()
+        if 'facebook.com' in href:
+            social_links['facebook'] = href
+        elif 'twitter.com' in href or 'x.com' in href:
+            social_links['twitter'] = href
+        elif 'linkedin.com' in href:
+            social_links['linkedin'] = href
+        elif 'instagram.com' in href:
+            social_links['instagram'] = href
+    
+    return {
+        "emails": emails,
+        "phones": phones,
+        "social_links": social_links
+    }
+
+def analyze_website_quality(seo_data: dict) -> dict:
+    """Analyze website quality and provide scores"""
+    scores = {}
+    issues = []
+    recommendations = []
+    
+    # Title analysis
+    if not seo_data['title']:
+        scores['title'] = 0
+        issues.append("Missing page title")
+        recommendations.append("Add a descriptive title tag (50-60 characters)")
+    elif seo_data['title_length'] < 30:
+        scores['title'] = 50
+        issues.append("Title too short")
+        recommendations.append("Expand title to 50-60 characters")
+    elif seo_data['title_length'] > 60:
+        scores['title'] = 70
+        issues.append("Title may be truncated in search results")
+    else:
+        scores['title'] = 100
+    
+    # Description analysis
+    if not seo_data['description']:
+        scores['description'] = 0
+        issues.append("Missing meta description")
+        recommendations.append("Add meta description (150-160 characters)")
+    elif seo_data['description_length'] < 120:
+        scores['description'] = 50
+        issues.append("Meta description too short")
+    elif seo_data['description_length'] > 160:
+        scores['description'] = 70
+        issues.append("Meta description may be truncated")
+    else:
+        scores['description'] = 100
+    
+    # H1 analysis
+    if not seo_data['h1_tags']:
+        scores['h1'] = 0
+        issues.append("Missing H1 tag")
+        recommendations.append("Add one H1 tag per page")
+    elif len(seo_data['h1_tags']) > 1:
+        scores['h1'] = 70
+        issues.append("Multiple H1 tags found")
+    else:
+        scores['h1'] = 100
+    
+    # Image alt analysis
+    if seo_data['total_images'] > 0:
+        alt_score = ((seo_data['total_images'] - seo_data['images_without_alt']) / seo_data['total_images']) * 100
+        scores['images'] = int(alt_score)
+        if seo_data['images_without_alt'] > 0:
+            issues.append(f"{seo_data['images_without_alt']} images missing alt text")
+            recommendations.append("Add descriptive alt text to all images")
+    else:
+        scores['images'] = 100
+    
+    # Content analysis
+    if seo_data['word_count'] < 300:
+        scores['content'] = 30
+        issues.append("Low word count - may affect SEO")
+        recommendations.append("Add more content (aim for 500+ words)")
+    elif seo_data['word_count'] < 500:
+        scores['content'] = 60
+    else:
+        scores['content'] = 100
+    
+    # Overall score
+    overall = sum(scores.values()) / len(scores) if scores else 0
+    
+    return {
+        "overall_score": int(overall),
+        "scores": scores,
+        "issues": issues,
+        "recommendations": recommendations
+    }
+
+@api_router.post("/tools/analyze-website")
+async def analyze_website(request: WebsiteAnalysisRequest):
+    """Analyze a website for SEO, content, and quality"""
+    try:
+        html, error = await fetch_url(request.url)
+        
+        if error:
+            return {"success": False, "error": f"Could not fetch website: {error}"}
+        
+        seo_data = extract_seo_data(html, request.url)
+        contact_info = extract_contact_info(html)
+        quality_analysis = analyze_website_quality(seo_data)
+        
+        # Use AI to generate insights if available
+        ai_insights = None
+        try:
+            chat = LlmChat(
+                api_key=os.environ.get('EMERGENT_API_KEY'),
+                model="gpt-4o-mini",
+                system_message="You are a website analyst. Provide brief, actionable insights."
+            )
+            
+            prompt = f"""Analyze this website data and provide 3 quick actionable recommendations:
+            Title: {seo_data['title']}
+            Description: {seo_data['description']}
+            H1 Tags: {seo_data['h1_tags']}
+            Word Count: {seo_data['word_count']}
+            Issues Found: {quality_analysis['issues']}
+            
+            Keep response under 150 words."""
+            
+            response = await chat.send_message_async(UserMessage(text=prompt))
+            ai_insights = response.text
+        except Exception as e:
+            logging.error(f"AI insights error: {str(e)}")
+        
+        return {
+            "success": True,
+            "url": request.url,
+            "seo_data": seo_data,
+            "contact_info": contact_info,
+            "quality_analysis": quality_analysis,
+            "ai_insights": ai_insights
+        }
+    except Exception as e:
+        logging.error(f"Website analysis error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Analysis failed")
+
+@api_router.post("/tools/find-leads")
+async def find_business_leads(request: BusinessSearchRequest):
+    """Find potential business leads based on criteria"""
+    try:
+        # This would integrate with business directories or APIs
+        # For demo purposes, we provide guidance on how to find leads
+        
+        search_strategies = [
+            {
+                "source": "Google Maps",
+                "query": f"{request.industry} in {request.location}",
+                "url": f"https://www.google.com/maps/search/{request.industry}+{request.location.replace(' ', '+')}"
+            },
+            {
+                "source": "Yelp",
+                "query": f"{request.industry} near {request.location}",
+                "url": f"https://www.yelp.com/search?find_desc={request.industry}&find_loc={request.location.replace(' ', '+')}"
+            },
+            {
+                "source": "Yellow Pages",
+                "query": f"{request.industry} in {request.location}",
+                "url": f"https://www.yellowpages.com/search?search_terms={request.industry}&geo_location_terms={request.location.replace(' ', '+')}"
+            }
+        ]
+        
+        # Criteria for identifying good leads
+        lead_criteria = [
+            "No website or outdated website",
+            "Low Google reviews (opportunity to help)",
+            "No social media presence",
+            "Basic contact info only",
+            "No online booking system"
+        ]
+        
+        # Generate AI recommendations
+        ai_recommendations = None
+        try:
+            chat = LlmChat(
+                api_key=os.environ.get('EMERGENT_API_KEY'),
+                model="gpt-4o-mini",
+                system_message="You are a lead generation expert."
+            )
+            
+            prompt = f"""For a {request.industry} business looking for leads in {request.location}, provide:
+            1. 3 specific outreach strategies
+            2. Best times to contact
+            3. Key pain points to address
+            
+            Keep response under 150 words."""
+            
+            response = await chat.send_message_async(UserMessage(text=prompt))
+            ai_recommendations = response.text
+        except Exception as e:
+            logging.error(f"AI recommendations error: {str(e)}")
+        
+        return {
+            "success": True,
+            "search_criteria": {
+                "location": request.location,
+                "industry": request.industry,
+                "keywords": request.keywords
+            },
+            "search_strategies": search_strategies,
+            "lead_criteria": lead_criteria,
+            "ai_recommendations": ai_recommendations
+        }
+    except Exception as e:
+        logging.error(f"Find leads error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Lead search failed")
+
+@api_router.post("/tools/competitor-analysis")
+async def analyze_competitor(request: CompetitorAnalysisRequest):
+    """Analyze a competitor's website"""
+    try:
+        html, error = await fetch_url(request.competitor_url)
+        
+        if error:
+            return {"success": False, "error": f"Could not fetch competitor site: {error}"}
+        
+        seo_data = extract_seo_data(html, request.competitor_url)
+        contact_info = extract_contact_info(html)
+        
+        # Extract technologies (basic detection)
+        soup = BeautifulSoup(html, 'html.parser')
+        technologies = []
+        
+        # Check for common frameworks/tools
+        html_lower = html.lower()
+        if 'react' in html_lower or 'reactdom' in html_lower:
+            technologies.append("React")
+        if 'vue' in html_lower:
+            technologies.append("Vue.js")
+        if 'angular' in html_lower:
+            technologies.append("Angular")
+        if 'wordpress' in html_lower or 'wp-content' in html_lower:
+            technologies.append("WordPress")
+        if 'shopify' in html_lower:
+            technologies.append("Shopify")
+        if 'wix' in html_lower:
+            technologies.append("Wix")
+        if 'squarespace' in html_lower:
+            technologies.append("Squarespace")
+        if 'bootstrap' in html_lower:
+            technologies.append("Bootstrap")
+        if 'tailwind' in html_lower:
+            technologies.append("Tailwind CSS")
+        
+        # AI-powered competitive analysis
+        ai_analysis = None
+        try:
+            chat = LlmChat(
+                api_key=os.environ.get('EMERGENT_API_KEY'),
+                model="gpt-4o-mini",
+                system_message="You are a competitive analyst."
+            )
+            
+            prompt = f"""Analyze this competitor website:
+            Title: {seo_data['title']}
+            Description: {seo_data['description']}
+            H1: {seo_data['h1_tags']}
+            Word Count: {seo_data['word_count']}
+            Technologies: {technologies}
+            
+            Provide:
+            1. Their apparent target market
+            2. Strengths you can identify
+            3. Weaknesses/opportunities
+            
+            Keep response under 150 words."""
+            
+            response = await chat.send_message_async(UserMessage(text=prompt))
+            ai_analysis = response.text
+        except Exception as e:
+            logging.error(f"AI analysis error: {str(e)}")
+        
+        return {
+            "success": True,
+            "competitor_url": request.competitor_url,
+            "seo_data": seo_data,
+            "contact_info": contact_info,
+            "technologies_detected": technologies,
+            "ai_analysis": ai_analysis
+        }
+    except Exception as e:
+        logging.error(f"Competitor analysis error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Analysis failed")
+
+@api_router.post("/tools/content-research")
+async def research_content(request: ContentResearchRequest):
+    """Research content ideas for a topic"""
+    try:
+        # Generate content ideas using AI
+        content_ideas = None
+        try:
+            chat = LlmChat(
+                api_key=os.environ.get('EMERGENT_API_KEY'),
+                model="gpt-4o-mini",
+                system_message="You are a content strategist and SEO expert."
+            )
+            
+            industry_context = f" in the {request.industry} industry" if request.industry else ""
+            
+            prompt = f"""Generate content ideas for the topic "{request.topic}"{industry_context}.
+
+            Provide:
+            1. 5 blog post titles (SEO-optimized)
+            2. 3 long-tail keywords to target
+            3. 2 content format suggestions (video, infographic, etc.)
+            4. Estimated search intent (informational, transactional, etc.)
+            
+            Format as structured list."""
+            
+            response = await chat.send_message_async(UserMessage(text=prompt))
+            content_ideas = response.text
+        except Exception as e:
+            logging.error(f"Content research error: {str(e)}")
+            content_ideas = "AI content generation unavailable. Please try again."
+        
+        # Content planning tips
+        planning_tips = [
+            "Research competitors ranking for similar topics",
+            "Check Google 'People Also Ask' for related questions",
+            "Use long-tail keywords for easier ranking",
+            "Create comprehensive, authoritative content",
+            "Include relevant images and videos",
+            "Optimize for featured snippets"
+        ]
+        
+        return {
+            "success": True,
+            "topic": request.topic,
+            "industry": request.industry,
+            "content_ideas": content_ideas,
+            "planning_tips": planning_tips
+        }
+    except Exception as e:
+        logging.error(f"Content research error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Research failed")
+
 # ============ WEBHOOKS & TRACKING ============
 
 class WebhookEvent(BaseModel):
