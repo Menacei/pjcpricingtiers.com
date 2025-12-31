@@ -126,7 +126,13 @@ const ContactPage = () => {
 
               {/* Contact Info */}
               <div className="mt-8 pt-8 border-t border-slate-700">
-                <div className="grid md:grid-cols-3 gap-6 text-center">
+                <div className="grid md:grid-cols-4 gap-6 text-center">
+                  <div className="flex flex-col items-center">
+                    <Phone className="w-6 h-6 text-green-400 mb-2" />
+                    <a href="tel:+18163668960" className="text-gray-300 hover:text-cyan-400 transition-colors text-sm font-semibold">
+                      (816) 366-8960
+                    </a>
+                  </div>
                   <div className="flex flex-col items-center">
                     <Mail className="w-6 h-6 text-cyan-400 mb-2" />
                     <a href="mailto:Patrickjchurch04@gmail.com" className="text-gray-300 hover:text-cyan-400 transition-colors text-sm">
