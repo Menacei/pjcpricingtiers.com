@@ -27,6 +27,7 @@ import MenaceApparelPage from "./pages/MenaceApparelPage";
 
 // Admin Pages
 import LeadsDashboard from "./pages/admin/LeadsDashboard";
+import PaymentsDashboard from "./pages/admin/PaymentsDashboard";
 
 // Analytics tracking component
 const AnalyticsTracker = () => {
