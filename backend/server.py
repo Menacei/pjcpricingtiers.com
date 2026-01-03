@@ -1082,8 +1082,7 @@ async def create_blog_post(post_data: BlogPostCreate):
 async def track_social_share(post_id: str, platform: str):
     try:
         # Generate share URLs based on platform
-        base_url = "https://patjames-services.preview.emergentagent.com"
-        post_url = f"{base_url}/blog/{post_id}"
+        post_url = f"{BASE_URL}/blog/{post_id}"
         
         share_urls = {
             "facebook": f"https://www.facebook.com/sharer/sharer.php?u={post_url}",
