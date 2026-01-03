@@ -77,6 +77,7 @@ function App() {
 
           {/* Admin Pages */}
           <Route path="/admin/leads" element={<LeadsDashboard />} />
+          <Route path="/admin/payments" element={<PaymentsDashboard />} />
         </Routes>
         
         <Footer />
