@@ -67,6 +67,7 @@ function App() {
 
           {/* Funnel Pages */}
           <Route path="/get-quote" element={<LeadFormPage />} />
+          <Route path="/get-quote/thank-you" element={<ThankYouPage />} />
           <Route path="/thank-you" element={<ThankYouPage />} />
 
           {/* Business Pages */}
