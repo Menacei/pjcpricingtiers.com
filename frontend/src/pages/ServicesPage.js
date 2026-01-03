@@ -313,11 +313,18 @@ const ServicesPage = () => {
             <p className="text-gray-400 mb-4">
               Need something custom? Let's talk about your specific needs.
             </p>
-            <Link to="/contact">
-              <Button variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
-                Request Custom Quote
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/contact">
+                <Button variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
+                  Request Custom Quote
+                </Button>
+              </Link>
+              <a href="https://pjcpricingtiers.com" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" className="border-purple-500 text-purple-400 hover:bg-purple-500/10">
+                  View Full Pricing Details
+                </Button>
+              </a>
+            </div>
           </div>
         </div>
       </section>
