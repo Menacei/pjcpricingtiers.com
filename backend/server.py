@@ -681,6 +681,71 @@ async def verify_admin(_: None = Depends(verify_admin_key)):
     """Verify admin API key is valid"""
     return {"valid": True, "message": "API key is valid"}
 
+# Payment Dashboard Endpoints
+@api_router.get("/admin/payments")
+async def get_payments(status: Optional[str] = None, limit: int = 100, _: None = Depends(verify_admin_key)):
+    """Get all payment transactions for admin dashboard"""
+    try:
+        filter_query = {}
+        if status:
+            filter_query["payment_status"] = status
+        
+        transactions = await db.payment_transactions.find(filter_query, {"_id": 0}).sort("timestamp", -1).limit(limit).to_list(limit)
+        return transactions
+    except Exception as e:
+        logging.error(f"Get payments error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get payments")
+
+@api_router.get("/admin/payments/stats")
+async def get_payment_stats(_: None = Depends(verify_admin_key)):
+    """Get payment statistics for dashboard"""
+    try:
+        total = await db.payment_transactions.count_documents({})
+        completed = await db.payment_transactions.count_documents({"payment_status": "completed"})
+        pending = await db.payment_transactions.count_documents({"payment_status": "pending"})
+        failed = await db.payment_transactions.count_documents({"payment_status": "failed"})
+        
+        # Calculate total revenue from completed payments
+        pipeline = [
+            {"$match": {"payment_status": "completed"}},
+            {"$group": {"_id": None, "total_revenue": {"$sum": "$amount"}}}
+        ]
+        revenue_result = await db.payment_transactions.aggregate(pipeline).to_list(1)
+        total_revenue = revenue_result[0]["total_revenue"] if revenue_result else 0
+        
+        # Get payments by method
+        stripe_count = await db.payment_transactions.count_documents({"metadata.payment_method": "stripe", "payment_status": "completed"})
+        paypal_count = await db.payment_transactions.count_documents({"metadata.payment_method": "paypal", "payment_status": "completed"})
+        
+        return {
+            "total": total,
+            "completed": completed,
+            "pending": pending,
+            "failed": failed,
+            "total_revenue": round(total_revenue, 2),
+            "by_method": {
+                "stripe": stripe_count,
+                "paypal": paypal_count
+            }
+        }
+    except Exception as e:
+        logging.error(f"Get payment stats error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get payment stats")
+
+@api_router.get("/admin/payments/{transaction_id}")
+async def get_payment(transaction_id: str, _: None = Depends(verify_admin_key)):
+    """Get single payment transaction by ID"""
+    try:
+        transaction = await db.payment_transactions.find_one({"id": transaction_id}, {"_id": 0})
+        if not transaction:
+            raise HTTPException(status_code=404, detail="Transaction not found")
+        return transaction
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Get payment error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get payment")
+
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.dict()
