@@ -59,7 +59,7 @@ Multi-page, conversion-focused business website for Patrick "Pat" James Church f
 - **Integrations**: 
   - Emergent LLM (chatbot) - WORKING
   - Stripe (payments) - WORKING
-  - PayPal (payments) - MOCKED (needs user credentials)
+  - PayPal (payments) - WORKING
   - SendGrid (email) - installed, needs setup
 
 ## Key Pages
@@ -127,10 +127,9 @@ API Key: pjc_admin_key_x7K9mP2wQ5vL8nR3
 - **Portfolio Page**: Displaying all logos correctly
 
 ## Known Issues
-1. PayPal integration uses placeholder credentials (MOCKED)
-2. Calendar on Thank You page is placeholder
-3. Menace Apparel page is "Coming Soon" placeholder
-4. Dashboard screenshots pending (LogiDash, MoneyRadar)
+1. Calendar on Thank You page is placeholder
+2. Menace Apparel page is "Coming Soon" placeholder
+3. Dashboard screenshots pending (LogiDash, MoneyRadar)
 
 ## Files Reference
 - `/app/frontend/src/pages/ProofPage.js` - Portfolio page with logos
