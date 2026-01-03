@@ -300,6 +300,12 @@ const LeadsDashboard = () => {
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
+            <a href="/admin/payments">
+              <Button variant="outline" className="border-green-500 text-green-400 hover:bg-green-500/10">
+                <DollarSign className="w-4 h-4 mr-2" />
+                Payments
+              </Button>
+            </a>
             <Button onClick={handleLogout} variant="destructive">
               <LogOut className="w-4 h-4 mr-2" />
               Logout
