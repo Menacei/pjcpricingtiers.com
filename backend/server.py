@@ -598,6 +598,60 @@ async def initialize_lead_magnets():
 async def root():
     return {"message": "PJC Web Designs API"}
 
+# SEO Routes - Sitemap and Robots.txt
+@api_router.get("/sitemap.xml")
+async def get_sitemap():
+    """Generate XML sitemap for SEO"""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    pages = [
+        {"loc": "https://pjcwebdesigns.net/", "priority": "1.0", "changefreq": "weekly"},
+        {"loc": "https://pjcwebdesigns.net/services", "priority": "0.9", "changefreq": "weekly"},
+        {"loc": "https://pjcwebdesigns.net/get-quote", "priority": "0.9", "changefreq": "monthly"},
+        {"loc": "https://pjcwebdesigns.net/proof", "priority": "0.8", "changefreq": "weekly"},
+        {"loc": "https://pjcwebdesigns.net/tools", "priority": "0.8", "changefreq": "monthly"},
+        {"loc": "https://pjcwebdesigns.net/about", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": "https://pjcwebdesigns.net/contact", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": "https://pjcwebdesigns.net/blog", "priority": "0.7", "changefreq": "daily"},
+        {"loc": "https://pjcwebdesigns.net/newreach-transport", "priority": "0.6", "changefreq": "monthly"},
+        {"loc": "https://pjcwebdesigns.net/privacy", "priority": "0.3", "changefreq": "yearly"},
+    ]
+    
+    xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    
+    for page in pages:
+        xml_content += f'''  <url>
+    <loc>{page["loc"]}</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>{page["changefreq"]}</changefreq>
+    <priority>{page["priority"]}</priority>
+  </url>\n'''
+    
+    xml_content += '</urlset>'
+    
+    return Response(content=xml_content, media_type="application/xml")
+
+@api_router.get("/robots.txt")
+async def get_robots():
+    """Generate robots.txt for SEO"""
+    robots_content = """# robots.txt for pjcwebdesigns.net
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://pjcwebdesigns.net/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Crawl-delay: 1
+"""
+    return Response(content=robots_content, media_type="text/plain")
+
 # Admin authentication models and endpoints
 class AdminLoginRequest(BaseModel):
     username: str
