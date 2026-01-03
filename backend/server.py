@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime, timezone
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
-from paypalcheckoutsdk.core import SandboxEnvironment, LiveEnvironment
+from paypalcheckoutsdk.core import SandboxEnvironment, LiveEnvironment, PayPalHttpClient
 from paypalcheckoutsdk.orders import OrdersCreateRequest, OrdersCaptureRequest
 from paypalhttp import HttpError as PayPalHttpError
 import aiohttp
@@ -342,7 +342,7 @@ def get_paypal_client():
     
     # Use sandbox for testing, live for production
     environment = SandboxEnvironment(client_id=client_id, client_secret=client_secret)
-    return environment.client()
+    return PayPalHttpClient(environment)
 
 def calculate_package_price(package_id: str, total_pages: int = 0) -> Dict:
     """Calculate the final price based on package and number of pages"""
