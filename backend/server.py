@@ -608,16 +608,16 @@ async def get_sitemap():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     
     pages = [
-        {"loc": "https://pjcwebdesigns.net/", "priority": "1.0", "changefreq": "weekly"},
-        {"loc": "https://pjcwebdesigns.net/services", "priority": "0.9", "changefreq": "weekly"},
-        {"loc": "https://pjcwebdesigns.net/get-quote", "priority": "0.9", "changefreq": "monthly"},
-        {"loc": "https://pjcwebdesigns.net/proof", "priority": "0.8", "changefreq": "weekly"},
-        {"loc": "https://pjcwebdesigns.net/tools", "priority": "0.8", "changefreq": "monthly"},
-        {"loc": "https://pjcwebdesigns.net/about", "priority": "0.7", "changefreq": "monthly"},
-        {"loc": "https://pjcwebdesigns.net/contact", "priority": "0.7", "changefreq": "monthly"},
-        {"loc": "https://pjcwebdesigns.net/blog", "priority": "0.7", "changefreq": "daily"},
-        {"loc": "https://pjcwebdesigns.net/newreach-transport", "priority": "0.6", "changefreq": "monthly"},
-        {"loc": "https://pjcwebdesigns.net/privacy", "priority": "0.3", "changefreq": "yearly"},
+        {"loc": f"{BASE_URL}/", "priority": "1.0", "changefreq": "weekly"},
+        {"loc": f"{BASE_URL}/services", "priority": "0.9", "changefreq": "weekly"},
+        {"loc": f"{BASE_URL}/get-quote", "priority": "0.9", "changefreq": "monthly"},
+        {"loc": f"{BASE_URL}/proof", "priority": "0.8", "changefreq": "weekly"},
+        {"loc": f"{BASE_URL}/tools", "priority": "0.8", "changefreq": "monthly"},
+        {"loc": f"{BASE_URL}/about", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": f"{BASE_URL}/contact", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": f"{BASE_URL}/blog", "priority": "0.7", "changefreq": "daily"},
+        {"loc": f"{BASE_URL}/newreach-transport", "priority": "0.6", "changefreq": "monthly"},
+        {"loc": f"{BASE_URL}/privacy", "priority": "0.3", "changefreq": "yearly"},
     ]
     
     xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -638,12 +638,12 @@ async def get_sitemap():
 @api_router.get("/robots.txt")
 async def get_robots():
     """Generate robots.txt for SEO"""
-    robots_content = """# robots.txt for pjcwebdesigns.net
+    robots_content = f"""# robots.txt for pjcwebdesigns.net
 User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://pjcwebdesigns.net/sitemap.xml
+Sitemap: {BASE_URL}/sitemap.xml
 
 User-agent: Googlebot
 Allow: /
