@@ -25,6 +25,9 @@ import hashlib
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Base URL for SEO and links (defaults to production domain)
+BASE_URL = os.environ.get('BASE_URL', 'https://pjcwebdesigns.net')
+
 # Admin API key for secure endpoints
 ADMIN_API_KEY = os.environ.get('ADMIN_API_KEY', secrets.token_urlsafe(32))
 logging.info(f"Admin API Key set. Use this key for admin endpoints.")
