@@ -1455,13 +1455,10 @@ async def get_featured_social_posts():
         logging.error(f"Get featured social posts error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get featured social posts")
 
-# SEO Endpoints
-@api_router.get("/sitemap.xml")
-async def get_sitemap():
-    """Generate XML sitemap for SEO"""
-    from fastapi.responses import Response
-    
-    base_url = "https://patjames-services.preview.emergentagent.com"
+# SEO Endpoints (Extended)
+@api_router.get("/seo/sitemap.xml")
+async def get_extended_sitemap():
+    """Generate extended XML sitemap with blog posts"""
     
     # Get blog posts for sitemap
     try:
@@ -1472,32 +1469,32 @@ async def get_sitemap():
     sitemap_xml = f'''<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>{base_url}</loc>
-        <lastmod>2025-09-09</lastmod>
+        <loc>{BASE_URL}</loc>
+        <lastmod>2025-01-03</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>{base_url}/#pricing</loc>
-        <lastmod>2025-09-09</lastmod>
+        <loc>{BASE_URL}/services</loc>
+        <lastmod>2025-01-03</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>{base_url}/#portfolio</loc>
-        <lastmod>2025-09-09</lastmod>
+        <loc>{BASE_URL}/proof</loc>
+        <lastmod>2025-01-03</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>{base_url}/#blog</loc>
-        <lastmod>2025-09-09</lastmod>
+        <loc>{BASE_URL}/blog</loc>
+        <lastmod>2025-01-03</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>{base_url}/#contact</loc>
-        <lastmod>2025-09-09</lastmod>
+        <loc>{BASE_URL}/contact</loc>
+        <lastmod>2025-01-03</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>'''
@@ -1506,8 +1503,8 @@ async def get_sitemap():
     for post in blog_posts:
         sitemap_xml += f'''
     <url>
-        <loc>{base_url}/blog/{post.get('slug', post.get('id'))}</loc>
-        <lastmod>{post.get('timestamp', '2025-09-09')[:10]}</lastmod>
+        <loc>{BASE_URL}/blog/{post.get('slug', post.get('id'))}</loc>
+        <lastmod>{post.get('timestamp', '2025-01-03')[:10]}</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
     </url>'''
@@ -1517,46 +1514,19 @@ async def get_sitemap():
     
     return Response(content=sitemap_xml, media_type="application/xml")
 
-@api_router.get("/robots.txt")
-async def get_robots():
-    """Generate robots.txt for SEO"""
-    from fastapi.responses import Response
-    
-    robots_txt = """User-agent: *
-Allow: /
-
-# Sitemap
-Sitemap: https://pjcwebdesigns.solutions/api/sitemap.xml
-
-# Crawl-delay
-Crawl-delay: 1
-
-# Disallow certain paths
-Disallow: /api/
-Disallow: /admin/
-Disallow: /*.json$
-Disallow: /*?*
-
-# Allow important pages
-Allow: /api/sitemap.xml
-Allow: /api/robots.txt
-"""
-    
-    return Response(content=robots_txt, media_type="text/plain")
-
 @api_router.get("/seo/meta")
 async def get_seo_meta():
     """Get SEO metadata for dynamic pages"""
     return {
-        "title": "Pat Church - AI-Powered Web Design & Automation | Kansas City",
-        "description": "I'm Pat Church, and I build websites that actually make money. AI integration, automation, and strategic web design for small businesses in Kansas City and beyond.",
-        "keywords": "AI web design, automation, lead generation, Kansas City web designer, small business websites, AI chatbots, custom automation",
-        "canonical": "https://patjames-services.preview.emergentagent.com",
-        "og_image": "https://images.unsplash.com/photo-1559028012-481c04fa702d",
+        "title": "PJC Web Designs - AI-Powered Websites That Generate Leads | Kansas City",
+        "description": "Custom web design with AI chatbots & automation that turns visitors into paying customers. Affordable packages starting at $325. Serving Kansas City & nationwide.",
+        "keywords": "web design Kansas City, AI website design, small business website, affordable web design, lead generation website, AI chatbot integration",
+        "canonical": BASE_URL,
+        "og_image": f"{BASE_URL}/og-image.png",
         "structured_data": {
             "@context": "https://schema.org",
             "@type": "ProfessionalService",
-            "name": "Pat Church - Web Design & AI Automation",
+            "name": "PJC Web Designs",
             "priceRange": "$325-$1625+"
         }
     }
