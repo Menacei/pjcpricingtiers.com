@@ -125,7 +125,7 @@ const HomePage = () => {
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
-                <a href="https://calendly.com/patrickjchurch" target="_blank" rel="noopener noreferrer">
+                <a href="https://calendly.com/patrickjchurch04/15-minute-consultation" target="_blank" rel="noopener noreferrer">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 px-8 py-6 text-lg">
                     <Calendar className="mr-2 w-5 h-5" />
                     Book a Call
@@ -275,7 +275,7 @@ const HomePage = () => {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <a href="https://calendly.com/patrickjchurch" target="_blank" rel="noopener noreferrer">
+            <a href="https://calendly.com/patrickjchurch04/15-minute-consultation" target="_blank" rel="noopener noreferrer">
               <Button size="lg" variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 px-8 py-6 text-lg">
                 <Phone className="mr-2 w-5 h-5" />
                 Book a Call
