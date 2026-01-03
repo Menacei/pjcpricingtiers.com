@@ -3,7 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
-import { CheckCircle, Calendar, Mail, Phone, ArrowRight, Clock } from 'lucide-react';
+import { CheckCircle, Calendar, Mail, ArrowRight } from 'lucide-react';
 
 const ThankYouPage = () => {
   const location = useLocation();
@@ -19,11 +19,25 @@ const ThankYouPage = () => {
     if (window.fbq) {
       window.fbq('track', 'CompleteRegistration');
     }
+
+    // Load Calendly widget script
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      const existingScript = document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]');
+      if (existingScript) {
+        document.body.removeChild(existingScript);
+      }
+    };
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900/20 to-slate-900 pt-20 pb-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Success Message */}
         <div className="text-center mb-8">
           <div className="w-20 h-20 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-6">
@@ -83,20 +97,24 @@ const ThankYouPage = () => {
           </CardContent>
         </Card>
 
-        {/* Book a Call CTA */}
-        <Card className="bg-gradient-to-r from-cyan-900/50 to-purple-900/50 border-cyan-500/30 mb-8">
-          <CardContent className="p-8 text-center">
-            <Calendar className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-3">Want to Talk Sooner?</h2>
-            <p className="text-gray-300 mb-6">
-              Skip the wait and book a free 15-minute discovery call with me.
-            </p>
-            <a href="https://calendly.com/patrickjchurch" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700">
-                <Calendar className="mr-2 w-5 h-5" />
-                Book a Free Call
-              </Button>
-            </a>
+        {/* Calendly Embed */}
+        <Card className="bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border-cyan-500/30 mb-8">
+          <CardContent className="p-6">
+            <div className="text-center mb-6">
+              <Calendar className="w-10 h-10 text-cyan-400 mx-auto mb-3" />
+              <h2 className="text-2xl font-bold text-white mb-2">Book Your Free Consultation</h2>
+              <p className="text-gray-300">
+                Skip the wait - schedule a 15-minute discovery call right now.
+              </p>
+            </div>
+            
+            {/* Calendly Inline Widget */}
+            <div 
+              className="calendly-inline-widget rounded-lg overflow-hidden" 
+              data-url="https://calendly.com/patrickjchurch04/15-minute-consultation?hide_gdpr_banner=1&background_color=1e293b&text_color=ffffff&primary_color=06b6d4"
+              style={{ minWidth: '320px', height: '700px' }}
+              data-testid="calendly-widget"
+            />
           </CardContent>
         </Card>
 
