@@ -1118,10 +1118,11 @@ async def create_paypal_order(request: PayPalOrderRequest):
         # Get PayPal client
         paypal_client = get_paypal_client()
         
-        # Create PayPal order
+        # Create PayPal order request
         create_order_request = OrdersCreateRequest()
         create_order_request.prefer('return=representation')
-        create_order_request.request_body = {
+        
+        order_body = {
             "intent": "CAPTURE",
             "purchase_units": [{
                 "reference_id": request.package_id,
@@ -1129,7 +1130,7 @@ async def create_paypal_order(request: PayPalOrderRequest):
                     "currency_code": "USD", 
                     "value": f"{amount:.2f}"
                 },
-                "description": f"PJC Web Designs - {request.package_id.title()} Package"
+                "description": f"PJC Web Designs - {request.package_id.replace('_', ' ').title()} Package"
             }],
             "application_context": {
                 "return_url": f"{request.origin_url}/success",
@@ -1139,7 +1140,8 @@ async def create_paypal_order(request: PayPalOrderRequest):
                 "user_action": "PAY_NOW"
             }
         }
-
+        
+        create_order_request.request_body(order_body)
         response = paypal_client.execute(create_order_request)
         order = response.result
         
