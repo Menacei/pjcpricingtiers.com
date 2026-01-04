@@ -163,30 +163,50 @@ const ProofPage = () => {
     }
   ];
 
-  // Dashboard projects - placeholders
+  // Dashboard projects - with actual screenshots
   const dashboardProjects = [
     {
       id: 13,
-      title: "LogiDash",
+      title: "NewReach Control",
       category: "dashboard",
       industry: "Logistics",
-      description: "Comprehensive logistics management dashboard with real-time tracking, fleet management, and analytics.",
-      image: null,
-      tags: ["Dashboard", "Web App", "Logistics"],
-      services: ["UI/UX Design", "Web Development"],
-      comingSoon: true,
-      icon: <Monitor className="w-4 h-4" />
+      description: "Real-time logistics management dashboard featuring fleet overview, AI command center with insights, risk monitoring, and smart pricing calculator. Built for transportation and delivery businesses.",
+      image: "https://customer-assets.emergentagent.com/job_patjames-services/artifacts/ct2p0ab4_2e1eedfc1742cba5fc174dc12bc2d0e6cdd84656ead88e4895954739f92dab31.jpeg",
+      tags: ["Dashboard", "Logistics", "Fleet Management", "AI"],
+      services: ["UI/UX Design", "Web Development", "AI Integration"],
+      icon: <Truck className="w-4 h-4" />
     },
     {
       id: 14,
-      title: "MoneyRadar",
+      title: "Incident Management System",
+      category: "dashboard",
+      industry: "Security",
+      description: "Security incident tracking dashboard with real-time status monitoring, incident creation, and resolution workflow. Track open, investigating, and resolved incidents at a glance.",
+      image: "https://customer-assets.emergentagent.com/job_patjames-services/artifacts/khi9pr9y_750071547b109544196c70dd1efaf0ef88226e65b03e995702410b64f08dfba9.jpeg",
+      tags: ["Dashboard", "Security", "Incident Tracking"],
+      services: ["UI/UX Design", "Web Development"],
+      icon: <Monitor className="w-4 h-4" />
+    },
+    {
+      id: 15,
+      title: "MoneyRadar OS - Discovery",
       category: "dashboard",
       industry: "Finance",
-      description: "Personal finance tracking dashboard with expense analytics, budget management, and investment tracking.",
-      image: null,
-      tags: ["Dashboard", "Finance", "Analytics"],
-      services: ["UI/UX Design", "Web Development"],
-      comingSoon: true,
+      description: "AI-powered opportunity intelligence platform with automated job and opportunity discovery across 31 platforms. Features sentiment analysis and smart filtering for freelancers and job seekers.",
+      image: "https://customer-assets.emergentagent.com/job_patjames-services/artifacts/b75gvk8z_ab6ce1ff1745006eb930cd2721321d5d5c64ca51a17b3e5e92b18a8f2fc57c46.jpeg",
+      tags: ["Dashboard", "AI", "Career", "Finance"],
+      services: ["UI/UX Design", "Web Development", "AI Integration"],
+      icon: <TrendingUp className="w-4 h-4" />
+    },
+    {
+      id: 16,
+      title: "MoneyRadar OS - Command Center",
+      category: "dashboard",
+      industry: "Finance",
+      description: "Central command dashboard with intelligence modules, system capabilities overview, and quick actions. Features career tracking, salary negotiation tools, and certification recommendations.",
+      image: "https://customer-assets.emergentagent.com/job_patjames-services/artifacts/mt67txa4_2aa676a286df5c51d0e6d4f1d0c71ffdbbd2e242b2d94c7dd35f037f3e306023.jpeg",
+      tags: ["Dashboard", "Intelligence", "Analytics", "Career"],
+      services: ["UI/UX Design", "Web Development", "AI Integration"],
       icon: <Monitor className="w-4 h-4" />
     }
   ];
